@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+
+	<body>
+		<h1>Table</h1>
+
+		<div class="table">
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Age</th>
+						<th>Role</th>
+						<th>Species</th>
+						<th>Origin</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Frodo Baggins</td>
+						<td>50</td>
+						<td>Ring bearer</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+					</tr>
+					<tr>
+						<td>Samwise Gamgee</td>
+						<td>38</td>
+						<td>Gardener</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+					</tr>
+					<tr>
+						<td>Meriadoc Brandybuck</td>
+						<td>36</td>
+						<td>Adventurer</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+					</tr>
+					<tr>
+						<td>Peregrin Took</td>
+						<td>28</td>
+						<td>Adventurer</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+					</tr>
+					<tr>
+						<td>Aragorn</td>
+						<td>88</td>
+						<td>Ranger</td>
+						<td>Human</td>
+						<td>Arnor</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+
+	<h2>Without table head</h2>
+
+	<div class="table">
+		<table>
+			<tr>
+				<td>Sauron</td>
+				<td>Unknown</td>
+				<td>Dark Lord</td>
+				<td>Maiar</td>
+				<td>Mordor</td>
+			</tr>
+			<tr>
+				<td>Saruman</td>
+				<td>Unknown</td>
+				<td>Wizard</td>
+				<td>Maiar</td>
+				<td>Isengard</td>
+			</tr>
+			<tr>
+				<td>Shelob</td>
+				<td>Unknown</td>
+				<td>Spider</td>
+				<td>Spider</td>
+				<td>Cirith Ungol</td>
+			</tr>
+			<tr>
+				<td>Witch-king of Angmar</td>
+				<td>Unknown</td>
+				<td>Wraith</td>
+				<td>Human</td>
+				<td>Angmar</td>
+			</tr>
+			<tr>
+				<td>Balrog of Moria</td>
+				<td>Unknown</td>
+				<td>Demon</td>
+				<td>Maiar</td>
+				<td>Moria</td>
+			</tr>
+		</table>
+	</div>
+
+	<h2>With colspans</h2>
+
+	<div class="table">
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Age</th>
+					<th colspan="3">Info</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Bilbo Baggins</td>
+					<td>111</td>
+					<td>Adventurer</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+				</tr>
+				<tr>
+					<td>Gollum</td>
+					<td>589</td>
+					<td>Ring bearer</td>
+					<td>Hobbit</td>
+					<td>Misty Mountains</td>
+				</tr>
+				<tr>
+					<td>Gandalf</td>
+					<td>2000+</td>
+					<td>Wizard</td>
+					<td>Maiar</td>
+					<td>Valinor</td>
+				</tr>
+				<tr>
+					<td>Legolas</td>
+					<td>2931</td>
+					<td>Archer</td>
+					<td>Elf</td>
+					<td>Mirkwood</td>
+				</tr>
+				<tr>
+					<td>Gimli</td>
+					<td>139</td>
+					<td>Warrior</td>
+					<td>Dwarf</td>
+					<td>Erebor</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="table">
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Age</th>
+					<th colspan="3">
+						Info about the character like role, species and origin
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Boromir</td>
+					<td>41</td>
+					<td>Warrior</td>
+					<td>Human</td>
+					<td>Gondor</td>
+				</tr>
+				<tr>
+					<td>Faramir</td>
+					<td>36</td>
+					<td>Warrior</td>
+					<td>Human</td>
+					<td>Gondor</td>
+				</tr>
+				<tr>
+					<td>Denethor</td>
+					<td>89</td>
+					<td>Steward</td>
+					<td>Human</td>
+					<td>Gondor</td>
+				</tr>
+				<tr>
+					<td>Theoden</td>
+					<td>71</td>
+					<td>King</td>
+					<td>Human</td>
+					<td>Rohan</td>
+				</tr>
+				<tr>
+					<td>Eowyn</td>
+					<td>24</td>
+					<td>Shieldmaiden</td>
+					<td>Human</td>
+					<td>Rohan</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="table">
+		<table>
+			<tr>
+				<td>Galadriel</td>
+				<td>7000+</td>
+				<td>Queen</td>
+				<td>Elf</td>
+				<td>Lothlórien</td>
+			</tr>
+			<tr>
+				<td>Elrond</td>
+				<td>6000+</td>
+				<td>Lord</td>
+				<td>Elf</td>
+				<td>Rivendell</td>
+			</tr>
+			<tr>
+				<td>Arwen</td>
+				<td>3000+</td>
+				<td>Princess</td>
+				<td>Elf</td>
+				<td>Rivendell</td>
+			</tr>
+
+			<tr>
+				<td>Tom Bombadil</td>
+				<td>Unknown</td>
+				<td>Master</td>
+				<td>Unknown</td>
+				<td>Old Forest</td>
+			</tr>
+			<tr>
+				<td>Treebeard</td>
+				<td>Unknown</td>
+				<td>Shepherd of the Trees</td>
+				<td>Ent</td>
+				<td>Fangorn Forest</td>
+			</tr>
+			<tr>
+				<td>Barliman Butterbur</td>
+				<td>Unknown</td>
+				<td>Innkeeper</td>
+				<td>Human</td>
+				<td>Bree</td>
+			</tr>
+		</table>
+	</div>
+
+	<script src="index.js"></script>
+	<script>
+		const tables = Array.from(document.querySelectorAll('.table')).map((el) => {
+			return {
+				el,
+				table: new Table.Table(el),
+			};
+		});
+	</script>
+</html>
