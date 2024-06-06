@@ -150,34 +150,37 @@ export class Table {
 		// Reset width
 		this._setWidth([...th, ...td]);
 
-		th.forEach((_th, index) => {
-			if (_th.colSpan > 1) {
-				// @TODO td with colspan
-				const _td = Array.from(td).slice(index, index + _th.colSpan);
-				const width = Math.max(
-					_td.reduce((acc, el) => acc + el.offsetWidth, 0),
-					_th.offsetWidth
+		// Resize cells with colspan first
+		th.filter((_th) => _th.colSpan > 1).forEach((_th) => {
+			// @TODO td with colspan
+			const index = th.indexOf(_th);
+			const _td = td.slice(index, index + _th.colSpan);
+			const width = Math.max(
+				_td.reduce((acc, el) => acc + el.offsetWidth, 0),
+				_th.offsetWidth
+			);
+			this._setWidth(_th, width);
+			let remainingWidth = width;
+			_td.forEach((el, index) => {
+				const cellWidth = Math.max(
+					el.offsetWidth,
+					Math.floor(remainingWidth / (_th.colSpan - index))
 				);
-				this._setWidth(_th, width);
-				let remainingWidth = width;
-				_td.forEach((el, index) => {
-					const cellWidth = Math.max(
-						el.offsetWidth,
-						Math.floor(remainingWidth / (_th.colSpan - index))
-					);
-					this._setWidth(el, cellWidth);
-					remainingWidth -= cellWidth;
-				});
-			} else {
-				const _td = td[index];
-				this._setWidth([_th, _td], Math.max(_th.offsetWidth, _td.offsetWidth));
-			}
+				this._setWidth(el, cellWidth);
+				remainingWidth -= cellWidth;
+			});
+		});
+
+		th.filter((_th) => _th.colSpan === 1).forEach((_th, index) => {
+			const _td = td[index];
+			this._setWidth([_th, _td], Math.max(_th.offsetWidth, _td.offsetWidth));
 		});
 	}
 
 	// Set width to elements
 	_setWidth(el: HTMLElement | HTMLElement[], width?: number | string) {
 		(Array.isArray(el) ? el : [el]).forEach((el) => {
+			el.style.width = width ? `${width}px` : '';
 			el.style.minWidth = width ? `${width}px` : '';
 		});
 	}
