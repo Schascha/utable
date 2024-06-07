@@ -19,6 +19,7 @@ body {
 /* Table */
 :root {
 	--table-odd-bg-color: #f5f5f5;
+	--table-bg-color: white;
 }
 
 table {
@@ -68,4 +69,33 @@ tbody tr:nth-of-type(odd) {
 	&.is-sticky {
 		box-shadow: 0 3px 20px rgba(0, 0, 0, 0.1);
 	}
+}
+
+.scroll-left,
+.scroll-right {
+	transition: opacity 0.3s;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 2rem;
+	z-index: 2;
+}
+
+.scroll-left {
+	left: 0;
+	background: linear-gradient(
+		to left,
+		transparent,
+		var(--table-bg-color)
+	);
+}
+
+.scroll-right {
+	right: 0;
+	background: linear-gradient(
+		to right,
+		transparent,
+		var(--table-bg-color)
+	);
 }

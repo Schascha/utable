@@ -6,6 +6,8 @@
 
     const defaultOptions = {
         classScroller: 'scroller',
+        classScrollLeft: 'scroll-left',
+        classScrollRight: 'scroll-right',
         classSticky: 'is-sticky',
         classTrack: 'track',
     };
@@ -25,8 +27,7 @@
             // Split table into head and body
             if (this.trackHead) {
                 this.el.appendChild(this.trackHead);
-                // Detect when headers gets sticky
-                this._isStickyHeader();
+                this._isSticky();
             }
             this.el.appendChild(this.trackBody);
             // Resize event
@@ -36,26 +37,40 @@
         }
         get scrollerHead() {
             if (!this._scrollerHead && this.tableHead) {
-                this._scrollerHead = document.createElement('div');
-                this._scrollerHead.className = this.options.classScroller;
+                const { classScroller } = this.options;
+                this._scrollerHead = this._createElement('div', classScroller);
                 this._scrollerHead.appendChild(this.tableHead);
             }
             return this._scrollerHead;
         }
         get scrollerBody() {
             if (!this._scrollerBody) {
-                this._scrollerBody = document.createElement('div');
-                this._scrollerBody.className = this.options.classScroller;
+                const { classScroller } = this.options;
+                this._scrollerBody = this._createElement('div', classScroller);
                 this._scrollerBody.appendChild(this.tableBody);
                 this._scrollerBody.addEventListener('scroll', this._onScroll);
             }
             return this._scrollerBody;
         }
+        get scrollLeft() {
+            this._scrollLeft =
+                this._scrollLeft ||
+                    this._createScrollElement(this.options.classScrollLeft);
+            return this._scrollLeft;
+        }
+        get scrollRight() {
+            this._scrollRight =
+                this._scrollRight ||
+                    this._createScrollElement(this.options.classScrollRight);
+            return this._scrollRight;
+        }
         get tableBody() {
-            if (!this._tableBody) {
-                this._tableBody = this.table;
-            }
+            this._tableBody = this._tableBody || this.table;
             return this._tableBody;
+        }
+        get tableBodyHeight() {
+            var _a;
+            return ((_a = this.tableBody) === null || _a === void 0 ? void 0 : _a.offsetHeight) || 0;
         }
         get tableHead() {
             var _a;
@@ -78,23 +93,34 @@
         }
         get trackBody() {
             if (!this._trackBody) {
-                this._trackBody = document.createElement('div');
-                this._trackBody.className = this.options.classTrack;
+                this._trackBody = this._createElement('div', this.options.classTrack);
                 this._trackBody.appendChild(this.scrollerBody);
             }
             return this._trackBody;
         }
         get trackHead() {
             if (!this._trackHead && this.scrollerHead) {
-                this._trackHead = document.createElement('div');
-                this._trackHead.className = this.options.classTrack;
+                this._trackHead = this._createElement('div', this.options.classTrack);
                 this._trackHead.appendChild(this.scrollerHead);
             }
             return this._trackHead;
         }
         update() {
             this._setEqualWidth();
-            this._setEqualScroll();
+            this._isScrollable();
+        }
+        _createElement(tag, className, parent) {
+            const el = document.createElement(tag);
+            if (className)
+                el.className = className;
+            parent === null || parent === void 0 ? void 0 : parent.appendChild(el);
+            return el;
+        }
+        _createScrollElement(className) {
+            const el = [this._createElement('div', className, this.trackBody)];
+            this.trackHead &&
+                el.push(this._createElement('div', className, this.trackHead));
+            return el;
         }
         _createShadowTable() {
             var _a;
@@ -104,61 +130,45 @@
             this.shadowTable.style.zIndex = '-2147483640';
             this.shadowTable.style.width = '100%';
         }
-        _isStickyHeader() {
-            if (!window.IntersectionObserver) {
+        _isScrollable() {
+            const { clientWidth, scrollLeft, scrollWidth } = this.scrollerBody;
+            const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
+            const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
+            // Toggle scroll elements
+            this.scrollLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
+            this.scrollRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+            // Sync scroll position
+            if (this.scrollerHead)
+                this.scrollerHead.scrollLeft = scrollLeft;
+        }
+        _isSticky() {
+            if (!window.IntersectionObserver)
                 return;
-            }
+            // Detect when headers gets sticky
             this.observer = new window.IntersectionObserver(([e]) => {
                 var _a;
-                (_a = this.trackHead) === null || _a === void 0 ? void 0 : _a.classList.toggle(this.options.classSticky, e.intersectionRatio < 1);
-            }, {
-                threshold: [1],
-            });
+                return (_a = this.trackHead) === null || _a === void 0 ? void 0 : _a.classList.toggle(this.options.classSticky, e.intersectionRatio < 1);
+            }, { threshold: [1] });
+            // Observe top element
             this.observer.observe(this.top);
         }
         // Sync cell widths
         _setEqualWidth() {
             var _a, _b, _c, _d;
-            if (!this.tableHead) {
+            if (!this.tableHead || !this.shadowTable)
                 return;
-            }
+            // Append shadow table
+            (_b = (_a = this.el) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.insertBefore(this.shadowTable, this.el);
+            // Get elements
             const th = Array.from(this.tableHead.querySelectorAll('tr > *'));
             const td = Array.from(this.tableBody.querySelectorAll('tr:first-child > *'));
-            if (this.shadowTable) {
-                (_b = (_a = this.el) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.insertBefore(this.shadowTable, this.el);
-                const thShadow = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
-                const tdShadow = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
-                (_d = (_c = this.el) === null || _c === void 0 ? void 0 : _c.parentNode) === null || _d === void 0 ? void 0 : _d.removeChild(this.shadowTable);
-                [...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
-                [...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
-            }
-            // Reset width
-            // this._setWidth([...th, ...td]);
-            //
-            // // Resize cells with colspan first
-            // th.filter((_th) => _th.colSpan > 1).forEach((_th) => {
-            // 	// @TODO td with colspan
-            // 	const index = th.indexOf(_th);
-            // 	const _td = td.slice(index, index + _th.colSpan);
-            // 	const width = Math.max(
-            // 		_td.reduce((acc, el) => acc + el.offsetWidth, 0),
-            // 		_th.offsetWidth
-            // 	);
-            // 	this._setWidth(_th, width);
-            // 	let remainingWidth = width;
-            // 	_td.forEach((el, index) => {
-            // 		const cellWidth = Math.max(
-            // 			el.offsetWidth,
-            // 			Math.floor(remainingWidth / (_th.colSpan - index))
-            // 		);
-            // 		this._setWidth(el, cellWidth);
-            // 		remainingWidth -= cellWidth;
-            // 	});
-            // });
-            // th.filter((_th) => _th.colSpan === 1).forEach((_th, index) => {
-            // 	const _td = td[index];
-            // 	this._setWidth([_th, _td], Math.max(_th.offsetWidth, _td.offsetWidth));
-            // });
+            const thShadow = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
+            const tdShadow = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
+            // Remove shadow table
+            (_d = (_c = this.el) === null || _c === void 0 ? void 0 : _c.parentNode) === null || _d === void 0 ? void 0 : _d.removeChild(this.shadowTable);
+            // Set width
+            [...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
+            [...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
         }
         // Set width to elements
         _setWidth(el, width) {
@@ -167,17 +177,17 @@
                 el.style.minWidth = width ? `${width}px` : '';
             });
         }
-        // Sync scroll position
-        _setEqualScroll() {
-            if (this.scrollerHead && this.scrollerBody) {
-                this.scrollerHead.scrollLeft = this.scrollerBody.scrollLeft;
-            }
+        _toggleScroll(el, isScroll) {
+            el.style.opacity = !isScroll ? '0' : '1';
+            // Don't overlay scrollbar
+            if (el.parentElement === this.trackBody)
+                el.style.height = `${this.tableBodyHeight}px`;
         }
         _onResize() {
             this.update();
         }
         _onScroll() {
-            this._setEqualScroll();
+            this._isScrollable();
         }
     }
 

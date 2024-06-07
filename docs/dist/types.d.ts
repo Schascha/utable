@@ -1,9 +1,7 @@
-export interface ITable {
-    el: Element | string;
-    options: ITableOptions | undefined;
-}
 export interface ITableOptions {
     classScroller: string;
+    classScrollLeft: string;
+    classScrollRight: string;
     classSticky: string;
     classTrack: string;
 }

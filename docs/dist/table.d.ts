@@ -7,6 +7,8 @@ export declare class Table {
     table: HTMLTableElement | null | undefined;
     private _scrollerBody;
     private _scrollerHead;
+    private _scrollLeft;
+    private _scrollRight;
     private _tableBody;
     private _tableHead;
     private _top;
@@ -15,17 +17,23 @@ export declare class Table {
     constructor(el: Element | string, options?: ITableOptions);
     get scrollerHead(): HTMLDivElement | undefined;
     get scrollerBody(): HTMLDivElement;
+    get scrollLeft(): HTMLDivElement[];
+    get scrollRight(): HTMLDivElement[];
     get tableBody(): HTMLTableElement;
+    get tableBodyHeight(): number;
     get tableHead(): HTMLTableElement | undefined;
     get top(): any;
     get trackBody(): HTMLDivElement;
     get trackHead(): HTMLDivElement | undefined;
     update(): void;
+    _createElement<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, parent?: HTMLElement): HTMLElementTagNameMap[K];
+    _createScrollElement(className: string): HTMLDivElement[];
     _createShadowTable(): void;
-    _isStickyHeader(): void;
+    _isScrollable(): void;
+    _isSticky(): void;
     _setEqualWidth(): void;
     _setWidth(el: HTMLElement | HTMLElement[], width?: number | string): void;
-    _setEqualScroll(): void;
+    _toggleScroll(el: HTMLElement, isScroll: boolean): void;
     _onResize(): void;
     _onScroll(): void;
 }
