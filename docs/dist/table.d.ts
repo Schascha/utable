@@ -26,7 +26,11 @@ export declare class Table {
     get trackBody(): HTMLDivElement;
     get trackHead(): HTMLDivElement | undefined;
     update(): void;
-    _createElement<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, parent?: HTMLElement): HTMLElementTagNameMap[K];
+    _createElement<K extends keyof HTMLElementTagNameMap>(tag: K, options?: {
+        className?: string;
+        insertMethod?: 'prepend' | 'append' | 'before' | 'after';
+        parent?: Element;
+    }): HTMLElementTagNameMap[K];
     _createScrollElement(className: string): HTMLDivElement[];
     _createShadowTable(): void;
     _isScrollable(): void;

@@ -11,9 +11,24 @@ html {
 }
 
 body {
-	margin: 0;
+	margin: 0 auto;
 	padding: 1.5rem;
 	min-height: 200vh;
+	max-width: 760px;
+}
+
+h1 {
+	font-size: 2.25rem;
+	margin: 0 0 1.5rem;
+}
+
+h2 {
+	font-size: 1.75rem;
+	margin: 0 0 1.5rem;
+}
+
+p {
+	margin: 0 0 1.5rem;
 }
 
 /* Table */
@@ -38,7 +53,6 @@ tbody tr:nth-of-type(odd) {
 }
 
 .table {
-	max-width: 760px;
 	position: relative;
 	margin: 0 0 1.5rem;
 }

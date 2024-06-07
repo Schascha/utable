@@ -37,16 +37,18 @@
         }
         get scrollerHead() {
             if (!this._scrollerHead && this.tableHead) {
-                const { classScroller } = this.options;
-                this._scrollerHead = this._createElement('div', classScroller);
+                this._scrollerHead = this._createElement('div', {
+                    className: this.options.classScroller,
+                });
                 this._scrollerHead.appendChild(this.tableHead);
             }
             return this._scrollerHead;
         }
         get scrollerBody() {
             if (!this._scrollerBody) {
-                const { classScroller } = this.options;
-                this._scrollerBody = this._createElement('div', classScroller);
+                this._scrollerBody = this._createElement('div', {
+                    className: this.options.classScroller,
+                });
                 this._scrollerBody.appendChild(this.tableBody);
                 this._scrollerBody.addEventListener('scroll', this._onScroll);
             }
@@ -84,23 +86,28 @@
             return this._tableHead;
         }
         get top() {
-            var _a, _b;
-            if (!this._top) {
-                this._top = document.createElement('div');
-                (_b = (_a = this.el) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.insertBefore(this._top, this.el);
+            if (!this._top && this.el) {
+                this._top = this._createElement('div', {
+                    parent: this.el,
+                    insertMethod: 'before',
+                });
             }
             return this._top;
         }
         get trackBody() {
             if (!this._trackBody) {
-                this._trackBody = this._createElement('div', this.options.classTrack);
+                this._trackBody = this._createElement('div', {
+                    className: this.options.classTrack,
+                });
                 this._trackBody.appendChild(this.scrollerBody);
             }
             return this._trackBody;
         }
         get trackHead() {
             if (!this._trackHead && this.scrollerHead) {
-                this._trackHead = this._createElement('div', this.options.classTrack);
+                this._trackHead = this._createElement('div', {
+                    className: this.options.classTrack,
+                });
                 this._trackHead.appendChild(this.scrollerHead);
             }
             return this._trackHead;
@@ -109,17 +116,26 @@
             this._setEqualWidth();
             this._isScrollable();
         }
-        _createElement(tag, className, parent) {
+        // _createButton(classname: string, text: string) {
+        // 	const button = this._createElement('button', classname);
+        // 	button.type = 'button';
+        // 	button.innerHTML = `<span>${text}</span>`;
+        // 	this.trackHead?.insertBefore(button, this.trackHead.firstChild);
+        // 	return button;
+        // }
+        _createElement(tag, options = {}) {
             const el = document.createElement(tag);
+            const { className, insertMethod, parent } = options;
             if (className)
                 el.className = className;
-            parent === null || parent === void 0 ? void 0 : parent.appendChild(el);
+            if (parent)
+                parent[insertMethod || 'append'](el);
             return el;
         }
         _createScrollElement(className) {
-            const el = [this._createElement('div', className, this.trackBody)];
-            this.trackHead &&
-                el.push(this._createElement('div', className, this.trackHead));
+            const { _createElement: $, trackBody, trackHead } = this;
+            const el = [$('div', { className, parent: trackBody })];
+            trackHead && el.push($('div', { className, parent: trackHead }));
             return el;
         }
         _createShadowTable() {
@@ -128,7 +144,6 @@
             this.shadowTable.style.visibility = 'hidden';
             this.shadowTable.style.position = 'absolute';
             this.shadowTable.style.zIndex = '-2147483640';
-            this.shadowTable.style.width = '100%';
         }
         _isScrollable() {
             const { clientWidth, scrollLeft, scrollWidth } = this.scrollerBody;
@@ -154,18 +169,19 @@
         }
         // Sync cell widths
         _setEqualWidth() {
-            var _a, _b, _c, _d;
+            var _a, _b, _c, _d, _e;
             if (!this.tableHead || !this.shadowTable)
                 return;
             // Append shadow table
             (_b = (_a = this.el) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.insertBefore(this.shadowTable, this.el);
+            this.shadowTable.style.width = ((_c = this.el) === null || _c === void 0 ? void 0 : _c.clientWidth) + 'px';
             // Get elements
             const th = Array.from(this.tableHead.querySelectorAll('tr > *'));
             const td = Array.from(this.tableBody.querySelectorAll('tr:first-child > *'));
             const thShadow = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
             const tdShadow = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
             // Remove shadow table
-            (_d = (_c = this.el) === null || _c === void 0 ? void 0 : _c.parentNode) === null || _d === void 0 ? void 0 : _d.removeChild(this.shadowTable);
+            (_e = (_d = this.el) === null || _d === void 0 ? void 0 : _d.parentNode) === null || _e === void 0 ? void 0 : _e.removeChild(this.shadowTable);
             // Set width
             [...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
             [...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
