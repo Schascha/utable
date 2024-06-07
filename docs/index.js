@@ -20,6 +20,9 @@
             if (!this.el || !(this.el instanceof Element) || !this.table) {
                 throw new Error('Element not found');
             }
+            // Create shadow table
+            this._createShadowTable();
+            // Split table into head and body
             if (this.trackHead) {
                 this.el.appendChild(this.trackHead);
                 // Detect when headers gets sticky
@@ -93,6 +96,14 @@
             this._setEqualWidth();
             this._setEqualScroll();
         }
+        _createShadowTable() {
+            var _a;
+            this.shadowTable = (_a = this.el) === null || _a === void 0 ? void 0 : _a.cloneNode(true);
+            this.shadowTable.style.visibility = 'hidden';
+            this.shadowTable.style.position = 'absolute';
+            this.shadowTable.style.zIndex = '-2147483640';
+            this.shadowTable.style.width = '100%';
+        }
         _isStickyHeader() {
             if (!window.IntersectionObserver) {
                 return;
@@ -107,31 +118,47 @@
         }
         // Sync cell widths
         _setEqualWidth() {
+            var _a, _b, _c, _d;
             if (!this.tableHead) {
                 return;
             }
             const th = Array.from(this.tableHead.querySelectorAll('tr > *'));
             const td = Array.from(this.tableBody.querySelectorAll('tr:first-child > *'));
+            if (this.shadowTable) {
+                (_b = (_a = this.el) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.insertBefore(this.shadowTable, this.el);
+                const thShadow = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
+                const tdShadow = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
+                (_d = (_c = this.el) === null || _c === void 0 ? void 0 : _c.parentNode) === null || _d === void 0 ? void 0 : _d.removeChild(this.shadowTable);
+                [...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
+                [...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
+            }
             // Reset width
-            this._setWidth([...th, ...td]);
-            // Resize cells with colspan first
-            th.filter((_th) => _th.colSpan > 1).forEach((_th) => {
-                // @TODO td with colspan
-                const index = th.indexOf(_th);
-                const _td = td.slice(index, index + _th.colSpan);
-                const width = Math.max(_td.reduce((acc, el) => acc + el.offsetWidth, 0), _th.offsetWidth);
-                this._setWidth(_th, width);
-                let remainingWidth = width;
-                _td.forEach((el, index) => {
-                    const cellWidth = Math.max(el.offsetWidth, Math.floor(remainingWidth / (_th.colSpan - index)));
-                    this._setWidth(el, cellWidth);
-                    remainingWidth -= cellWidth;
-                });
-            });
-            th.filter((_th) => _th.colSpan === 1).forEach((_th, index) => {
-                const _td = td[index];
-                this._setWidth([_th, _td], Math.max(_th.offsetWidth, _td.offsetWidth));
-            });
+            // this._setWidth([...th, ...td]);
+            //
+            // // Resize cells with colspan first
+            // th.filter((_th) => _th.colSpan > 1).forEach((_th) => {
+            // 	// @TODO td with colspan
+            // 	const index = th.indexOf(_th);
+            // 	const _td = td.slice(index, index + _th.colSpan);
+            // 	const width = Math.max(
+            // 		_td.reduce((acc, el) => acc + el.offsetWidth, 0),
+            // 		_th.offsetWidth
+            // 	);
+            // 	this._setWidth(_th, width);
+            // 	let remainingWidth = width;
+            // 	_td.forEach((el, index) => {
+            // 		const cellWidth = Math.max(
+            // 			el.offsetWidth,
+            // 			Math.floor(remainingWidth / (_th.colSpan - index))
+            // 		);
+            // 		this._setWidth(el, cellWidth);
+            // 		remainingWidth -= cellWidth;
+            // 	});
+            // });
+            // th.filter((_th) => _th.colSpan === 1).forEach((_th, index) => {
+            // 	const _td = td[index];
+            // 	this._setWidth([_th, _td], Math.max(_th.offsetWidth, _td.offsetWidth));
+            // });
         }
         // Set width to elements
         _setWidth(el, width) {

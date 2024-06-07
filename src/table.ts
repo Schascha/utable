@@ -10,6 +10,7 @@ export class Table {
 	el: Element | null | undefined;
 	observer: IntersectionObserver | undefined;
 	options: ITableOptions;
+	shadowTable: HTMLElement | undefined;
 	table: HTMLTableElement | null | undefined;
 	private _scrollerBody: HTMLDivElement | undefined;
 	private _scrollerHead: HTMLDivElement | undefined;
@@ -23,7 +24,6 @@ export class Table {
 		this.el = typeof el === 'string' ? document.querySelector(el) : el;
 		this.options = { ...options, ...defaultOptions };
 		this.table = this.el?.querySelector('table');
-
 		this._onResize = this._onResize.bind(this);
 		this._onScroll = this._onScroll.bind(this);
 
@@ -31,6 +31,10 @@ export class Table {
 			throw new Error('Element not found');
 		}
 
+		// Create shadow table
+		this._createShadowTable();
+
+		// Split table into head and body
 		if (this.trackHead) {
 			this.el.appendChild(this.trackHead);
 			// Detect when headers gets sticky
@@ -114,6 +118,14 @@ export class Table {
 		this._setEqualScroll();
 	}
 
+	_createShadowTable() {
+		this.shadowTable = this.el?.cloneNode(true) as HTMLElement;
+		this.shadowTable.style.visibility = 'hidden';
+		this.shadowTable.style.position = 'absolute';
+		this.shadowTable.style.zIndex = '-2147483640';
+		this.shadowTable.style.width = '100%';
+	}
+
 	_isStickyHeader() {
 		if (!window.IntersectionObserver) {
 			return;
@@ -147,34 +159,18 @@ export class Table {
 			this.tableBody.querySelectorAll('tr:first-child > *')
 		);
 
-		// Reset width
-		this._setWidth([...th, ...td]);
-
-		// Resize cells with colspan first
-		th.filter((_th) => _th.colSpan > 1).forEach((_th) => {
-			// @TODO td with colspan
-			const index = th.indexOf(_th);
-			const _td = td.slice(index, index + _th.colSpan);
-			const width = Math.max(
-				_td.reduce((acc, el) => acc + el.offsetWidth, 0),
-				_th.offsetWidth
-			);
-			this._setWidth(_th, width);
-			let remainingWidth = width;
-			_td.forEach((el, index) => {
-				const cellWidth = Math.max(
-					el.offsetWidth,
-					Math.floor(remainingWidth / (_th.colSpan - index))
-				);
-				this._setWidth(el, cellWidth);
-				remainingWidth -= cellWidth;
-			});
-		});
-
-		th.filter((_th) => _th.colSpan === 1).forEach((_th, index) => {
-			const _td = td[index];
-			this._setWidth([_th, _td], Math.max(_th.offsetWidth, _td.offsetWidth));
-		});
+		if (this.shadowTable) {
+			this.el?.parentNode?.insertBefore(this.shadowTable, this.el);
+			const thShadow = Array.from(
+				this.shadowTable.querySelectorAll('thead > tr > *')
+			).map((el) => el.getBoundingClientRect().width);
+			const tdShadow = Array.from(
+				this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')
+			).map((el) => el.getBoundingClientRect().width);
+			this.el?.parentNode?.removeChild(this.shadowTable);
+			[...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
+			[...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
+		}
 	}
 
 	// Set width to elements

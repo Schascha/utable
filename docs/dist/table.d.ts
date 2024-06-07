@@ -3,6 +3,7 @@ export declare class Table {
     el: Element | null | undefined;
     observer: IntersectionObserver | undefined;
     options: ITableOptions;
+    shadowTable: HTMLElement | undefined;
     table: HTMLTableElement | null | undefined;
     private _scrollerBody;
     private _scrollerHead;
@@ -20,6 +21,7 @@ export declare class Table {
     get trackBody(): HTMLDivElement;
     get trackHead(): HTMLDivElement | undefined;
     update(): void;
+    _createShadowTable(): void;
     _isStickyHeader(): void;
     _setEqualWidth(): void;
     _setWidth(el: HTMLElement | HTMLElement[], width?: number | string): void;
