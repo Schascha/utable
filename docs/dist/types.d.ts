@@ -4,4 +4,5 @@ export interface ITableOptions {
     classScrollRight: string;
     classSticky: string;
     classTrack: string;
+    classWrapper: string;
 }

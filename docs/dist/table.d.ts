@@ -1,10 +1,10 @@
 import type { ITableOptions } from './types';
 export declare class Table {
-    el: Element | null | undefined;
     observer: IntersectionObserver | undefined;
     options: ITableOptions;
     shadowTable: HTMLElement | undefined;
-    table: HTMLTableElement | null | undefined;
+    table: HTMLTableElement;
+    private _el;
     private _scrollerBody;
     private _scrollerHead;
     private _scrollLeft;
@@ -14,7 +14,8 @@ export declare class Table {
     private _top;
     private _trackBody;
     private _trackHead;
-    constructor(el: Element | string, options?: ITableOptions);
+    constructor(table: HTMLTableElement | string, options?: ITableOptions);
+    get el(): HTMLDivElement;
     get scrollerHead(): HTMLDivElement | undefined;
     get scrollerBody(): HTMLDivElement;
     get scrollLeft(): HTMLDivElement[];

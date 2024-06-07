@@ -1,6 +1,7 @@
 import type { ITableOptions } from './types';
 
 const defaultOptions: ITableOptions = {
+	classWrapper: 'table',
 	classScroller: 'scroller',
 	classScrollLeft: 'scroll-left',
 	classScrollRight: 'scroll-right',
@@ -9,11 +10,11 @@ const defaultOptions: ITableOptions = {
 };
 
 export class Table {
-	el: Element | null | undefined;
 	observer: IntersectionObserver | undefined;
 	options: ITableOptions;
 	shadowTable: HTMLElement | undefined;
-	table: HTMLTableElement | null | undefined;
+	table: HTMLTableElement;
+	private _el: HTMLDivElement | undefined;
 	private _scrollerBody: HTMLDivElement | undefined;
 	private _scrollerHead: HTMLDivElement | undefined;
 	private _scrollLeft: HTMLDivElement[] | undefined;
@@ -24,16 +25,19 @@ export class Table {
 	private _trackBody: HTMLDivElement | undefined;
 	private _trackHead: HTMLDivElement | undefined;
 
-	constructor(el: Element | string, options?: ITableOptions) {
-		this.el = typeof el === 'string' ? document.querySelector(el) : el;
+	constructor(table: HTMLTableElement | string, options?: ITableOptions) {
+		this.table = (
+			typeof table === 'string' ? document.querySelector(table) : table
+		) as HTMLTableElement;
 		this.options = { ...options, ...defaultOptions };
-		this.table = this.el?.querySelector('table');
-		this._onResize = this._onResize.bind(this);
-		this._onScroll = this._onScroll.bind(this);
 
-		if (!this.el || !(this.el instanceof Element) || !this.table) {
+		if (!this.table || !(this.table instanceof HTMLTableElement)) {
 			throw new Error('Element not found');
 		}
+
+		// Bind events
+		this._onResize = this._onResize.bind(this);
+		this._onScroll = this._onScroll.bind(this);
 
 		// Create shadow table
 		this._createShadowTable();
@@ -49,6 +53,18 @@ export class Table {
 		window.addEventListener('resize', this._onResize);
 		window.addEventListener('orientationchange', this._onResize);
 		this.update();
+	}
+
+	get el() {
+		if (!this._el) {
+			this._el = this._createElement('div', {
+				className: this.options.classWrapper,
+				insertMethod: 'before',
+				parent: this.table,
+			});
+			this._el.appendChild(this.table);
+		}
+		return this._el;
 	}
 
 	get scrollerHead() {
@@ -87,7 +103,7 @@ export class Table {
 	}
 
 	get tableBody() {
-		this._tableBody = this._tableBody || (this.table as HTMLTableElement);
+		this._tableBody = this._tableBody || this.table;
 		return this._tableBody;
 	}
 

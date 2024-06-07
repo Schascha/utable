@@ -5,6 +5,7 @@
 })(this, (function (exports) { 'use strict';
 
     const defaultOptions = {
+        classWrapper: 'table',
         classScroller: 'scroller',
         classScrollLeft: 'scroll-left',
         classScrollRight: 'scroll-right',
@@ -12,16 +13,15 @@
         classTrack: 'track',
     };
     class Table {
-        constructor(el, options) {
-            var _a;
-            this.el = typeof el === 'string' ? document.querySelector(el) : el;
+        constructor(table, options) {
+            this.table = (typeof table === 'string' ? document.querySelector(table) : table);
             this.options = Object.assign(Object.assign({}, options), defaultOptions);
-            this.table = (_a = this.el) === null || _a === void 0 ? void 0 : _a.querySelector('table');
-            this._onResize = this._onResize.bind(this);
-            this._onScroll = this._onScroll.bind(this);
-            if (!this.el || !(this.el instanceof Element) || !this.table) {
+            if (!this.table || !(this.table instanceof HTMLTableElement)) {
                 throw new Error('Element not found');
             }
+            // Bind events
+            this._onResize = this._onResize.bind(this);
+            this._onScroll = this._onScroll.bind(this);
             // Create shadow table
             this._createShadowTable();
             // Split table into head and body
@@ -34,6 +34,17 @@
             window.addEventListener('resize', this._onResize);
             window.addEventListener('orientationchange', this._onResize);
             this.update();
+        }
+        get el() {
+            if (!this._el) {
+                this._el = this._createElement('div', {
+                    className: this.options.classWrapper,
+                    insertMethod: 'before',
+                    parent: this.table,
+                });
+                this._el.appendChild(this.table);
+            }
+            return this._el;
         }
         get scrollerHead() {
             if (!this._scrollerHead && this.tableHead) {

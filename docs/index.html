@@ -10,61 +10,57 @@
 	<body>
 		<h1>Table</h1>
 
-		<div class="table">
-			<table>
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Age</th>
-						<th>Role</th>
-						<th>Species</th>
-						<th>Origin</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>Frodo Baggins</td>
-						<td>50</td>
-						<td>Ring bearer</td>
-						<td>Hobbit</td>
-						<td>Shire</td>
-					</tr>
-					<tr>
-						<td>Samwise Gamgee</td>
-						<td>38</td>
-						<td>Gardener</td>
-						<td>Hobbit</td>
-						<td>Shire</td>
-					</tr>
-					<tr>
-						<td>Meriadoc Brandybuck</td>
-						<td>36</td>
-						<td>Adventurer</td>
-						<td>Hobbit</td>
-						<td>Shire</td>
-					</tr>
-					<tr>
-						<td>Peregrin Took</td>
-						<td>28</td>
-						<td>Adventurer</td>
-						<td>Hobbit</td>
-						<td>Shire</td>
-					</tr>
-					<tr>
-						<td>Aragorn</td>
-						<td>88</td>
-						<td>Ranger</td>
-						<td>Human</td>
-						<td>Arnor</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</body>
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Age</th>
+					<th>Role</th>
+					<th>Species</th>
+					<th>Origin</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Frodo Baggins</td>
+					<td>50</td>
+					<td>Ring bearer</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+				</tr>
+				<tr>
+					<td>Samwise Gamgee</td>
+					<td>38</td>
+					<td>Gardener</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+				</tr>
+				<tr>
+					<td>Meriadoc Brandybuck</td>
+					<td>36</td>
+					<td>Adventurer</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+				</tr>
+				<tr>
+					<td>Peregrin Took</td>
+					<td>28</td>
+					<td>Adventurer</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+				</tr>
+				<tr>
+					<td>Aragorn</td>
+					<td>88</td>
+					<td>Ranger</td>
+					<td>Human</td>
+					<td>Arnor</td>
+				</tr>
+			</tbody>
+		</table>
 
-	<h2>Without table head</h2>
+		<h2>Without table head</h2>
 
-	<div class="table">
 		<table>
 			<tr>
 				<td>Sauron</td>
@@ -102,11 +98,9 @@
 				<td>Moria</td>
 			</tr>
 		</table>
-	</div>
 
-	<h2>With colspans</h2>
+		<h2>With colspans</h2>
 
-	<div class="table">
 		<table>
 			<thead>
 				<tr>
@@ -153,9 +147,7 @@
 				</tr>
 			</tbody>
 		</table>
-	</div>
 
-	<div class="table">
 		<table>
 			<thead>
 				<tr>
@@ -205,17 +197,15 @@
 				</tr>
 			</tbody>
 		</table>
-	</div>
 
-	<div class="table">
 		<table>
 			<thead>
 				<tr>
 					<th>Name</th>
 					<th>Age</th>
-					<th></th>
-					<th></th>
-					<th></th>
+					<th>Role</th>
+					<th>Species</th>
+					<th>Origin</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -237,20 +227,24 @@
 				<tr>
 					<td>Treebeard</td>
 					<td>Unknown</td>
-					<td colspan="3">Ent leader of Fangorn Forest</td>
+					<td>Shepherd of the Trees</td>
+					<td>Ent</td>
+					<td>Fangorn Forest</td>
 				</tr>
 				<tr>
 					<td>Tom Bombadil</td>
 					<td>Unknown</td>
-					<td colspan="3">Master of the Old Forest</td>
+					<td>Master</td>
+					<td>Unknown</td>
+					<td>Old Forest</td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
+	</body>
 
 	<script src="index.js"></script>
 	<script>
-		const tables = Array.from(document.querySelectorAll('.table')).map((el) => {
+		const tables = Array.from(document.querySelectorAll('table')).map((el) => {
 			return {
 				el,
 				table: new Table.Table(el),
