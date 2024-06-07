@@ -5,23 +5,31 @@
 })(this, (function (exports) { 'use strict';
 
     const defaultOptions = {
-        classWrapper: 'table',
+        buttons: true,
+        classButtonLeft: 'button-left',
+        classButtonRight: 'button-right',
         classScroller: 'scroller',
         classScrollLeft: 'scroll-left',
         classScrollRight: 'scroll-right',
         classSticky: 'is-sticky',
         classTrack: 'track',
+        classWrapper: 'table',
+        textButtonLeft: 'Left',
+        textButtonRight: 'Right',
     };
     class Table {
         constructor(table, options) {
             this.table = (typeof table === 'string' ? document.querySelector(table) : table);
             this.options = Object.assign(Object.assign({}, options), defaultOptions);
+            this.isScrollable = false;
             if (!this.table || !(this.table instanceof HTMLTableElement)) {
                 throw new Error('Element not found');
             }
             // Bind events
             this._onResize = this._onResize.bind(this);
             this._onScroll = this._onScroll.bind(this);
+            this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
+            this._onClickButtonRight = this._onClickButtonRight.bind(this);
             // Create shadow table
             this._createShadowTable();
             // Split table into head and body
@@ -45,6 +53,22 @@
                 this._el.appendChild(this.table);
             }
             return this._el;
+        }
+        get buttonLeft() {
+            if (!this._buttonLeft) {
+                const { classButtonLeft, textButtonLeft } = this.options;
+                this._buttonLeft = this._createButton(classButtonLeft, textButtonLeft);
+                this._buttonLeft.addEventListener('click', this._onClickButtonLeft);
+            }
+            return this._buttonLeft;
+        }
+        get buttonRight() {
+            if (!this._buttonRight) {
+                const { classButtonRight, textButtonRight } = this.options;
+                this._buttonRight = this._createButton(classButtonRight, textButtonRight);
+                this._buttonRight.addEventListener('click', this._onClickButtonRight);
+            }
+            return this._buttonRight;
         }
         get scrollerHead() {
             if (!this._scrollerHead && this.tableHead) {
@@ -97,7 +121,7 @@
             return this._tableHead;
         }
         get top() {
-            if (!this._top && this.el) {
+            if (!this._top) {
                 this._top = this._createElement('div', {
                     parent: this.el,
                     insertMethod: 'before',
@@ -127,13 +151,16 @@
             this._setEqualWidth();
             this._isScrollable();
         }
-        // _createButton(classname: string, text: string) {
-        // 	const button = this._createElement('button', classname);
-        // 	button.type = 'button';
-        // 	button.innerHTML = `<span>${text}</span>`;
-        // 	this.trackHead?.insertBefore(button, this.trackHead.firstChild);
-        // 	return button;
-        // }
+        _createButton(className, text) {
+            const button = this._createElement('button', {
+                className,
+                parent: this.trackHead,
+                insertMethod: 'prepend',
+            });
+            button.type = 'button';
+            button.innerHTML = `<span>${text}</span>`;
+            return button;
+        }
         _createElement(tag, options = {}) {
             const el = document.createElement(tag);
             const { className, insertMethod, parent } = options;
@@ -150,8 +177,7 @@
             return el;
         }
         _createShadowTable() {
-            var _a;
-            this.shadowTable = (_a = this.el) === null || _a === void 0 ? void 0 : _a.cloneNode(true);
+            this.shadowTable = this.table.cloneNode(true);
             this.shadowTable.style.visibility = 'hidden';
             this.shadowTable.style.position = 'absolute';
             this.shadowTable.style.zIndex = '-2147483640';
@@ -160,15 +186,21 @@
             const { clientWidth, scrollLeft, scrollWidth } = this.scrollerBody;
             const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
             const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
+            this.isScrollable = isScrollLeft || isScrollRight;
             // Toggle scroll elements
             this.scrollLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
             this.scrollRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+            // Toggle buttons
+            if (this.options.buttons) {
+                this._toggleButton(this.buttonRight, isScrollRight);
+                this._toggleButton(this.buttonLeft, isScrollLeft);
+            }
             // Sync scroll position
             if (this.scrollerHead)
                 this.scrollerHead.scrollLeft = scrollLeft;
         }
         _isSticky() {
-            if (!window.IntersectionObserver)
+            if (!window.IntersectionObserver || !this.top)
                 return;
             // Detect when headers gets sticky
             this.observer = new window.IntersectionObserver(([e]) => {
@@ -178,21 +210,33 @@
             // Observe top element
             this.observer.observe(this.top);
         }
+        _scrollTo(left) {
+            const { scrollerBody } = this;
+            if ('scrollBehavior' in document.documentElement.style) {
+                scrollerBody.scrollTo({
+                    behavior: 'smooth',
+                    left,
+                });
+            }
+            else {
+                scrollerBody.scrollLeft = left;
+            }
+        }
         // Sync cell widths
         _setEqualWidth() {
-            var _a, _b, _c, _d, _e;
+            var _a, _b;
             if (!this.tableHead || !this.shadowTable)
                 return;
             // Append shadow table
-            (_b = (_a = this.el) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.insertBefore(this.shadowTable, this.el);
-            this.shadowTable.style.width = ((_c = this.el) === null || _c === void 0 ? void 0 : _c.clientWidth) + 'px';
+            (_a = this.el.parentNode) === null || _a === void 0 ? void 0 : _a.insertBefore(this.shadowTable, this.el);
+            this.shadowTable.style.width = this.el.clientWidth + 'px';
             // Get elements
             const th = Array.from(this.tableHead.querySelectorAll('tr > *'));
             const td = Array.from(this.tableBody.querySelectorAll('tr:first-child > *'));
             const thShadow = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
             const tdShadow = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
             // Remove shadow table
-            (_e = (_d = this.el) === null || _d === void 0 ? void 0 : _d.parentNode) === null || _e === void 0 ? void 0 : _e.removeChild(this.shadowTable);
+            (_b = this.el.parentNode) === null || _b === void 0 ? void 0 : _b.removeChild(this.shadowTable);
             // Set width
             [...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
             [...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
@@ -204,11 +248,25 @@
                 el.style.minWidth = width ? `${width}px` : '';
             });
         }
+        _toggleButton(el, isScroll) {
+            el.disabled = !isScroll;
+            el.style.display = this.isScrollable ? '' : 'none';
+        }
         _toggleScroll(el, isScroll) {
             el.style.opacity = !isScroll ? '0' : '1';
             // Don't overlay scrollbar
             if (el.parentElement === this.trackBody)
                 el.style.height = `${this.tableBodyHeight}px`;
+        }
+        _onClickButtonLeft() {
+            const { clientWidth, scrollLeft } = this.scrollerBody;
+            this._scrollTo(scrollLeft - clientWidth * 0.75);
+            this._isScrollable();
+        }
+        _onClickButtonRight() {
+            const { clientWidth, scrollLeft } = this.scrollerBody;
+            this._scrollTo(scrollLeft + clientWidth * 0.75);
+            this._isScrollable();
         }
         _onResize() {
             this.update();

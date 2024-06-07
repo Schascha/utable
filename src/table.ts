@@ -1,35 +1,44 @@
 import type { ITableOptions } from './types';
 
 const defaultOptions: ITableOptions = {
-	classWrapper: 'table',
+	buttons: true,
+	classButtonLeft: 'button-left',
+	classButtonRight: 'button-right',
 	classScroller: 'scroller',
 	classScrollLeft: 'scroll-left',
 	classScrollRight: 'scroll-right',
 	classSticky: 'is-sticky',
 	classTrack: 'track',
+	classWrapper: 'table',
+	textButtonLeft: 'Left',
+	textButtonRight: 'Right',
 };
 
 export class Table {
+	isScrollable: boolean;
 	observer: IntersectionObserver | undefined;
 	options: ITableOptions;
-	shadowTable: HTMLElement | undefined;
+	shadowTable: HTMLTableElement | undefined;
 	table: HTMLTableElement;
-	private _el: HTMLDivElement | undefined;
-	private _scrollerBody: HTMLDivElement | undefined;
-	private _scrollerHead: HTMLDivElement | undefined;
-	private _scrollLeft: HTMLDivElement[] | undefined;
-	private _scrollRight: HTMLDivElement[] | undefined;
-	private _tableBody: HTMLTableElement | undefined;
-	private _tableHead: HTMLTableElement | undefined;
-	private _top: any;
-	private _trackBody: HTMLDivElement | undefined;
-	private _trackHead: HTMLDivElement | undefined;
+	private _buttonLeft!: HTMLButtonElement;
+	private _buttonRight!: HTMLButtonElement;
+	private _el!: HTMLDivElement;
+	private _scrollerBody!: HTMLDivElement;
+	private _scrollerHead!: HTMLDivElement;
+	private _scrollLeft!: HTMLDivElement[];
+	private _scrollRight!: HTMLDivElement[];
+	private _tableBody!: HTMLTableElement;
+	private _tableHead!: HTMLTableElement;
+	private _top!: HTMLDivElement;
+	private _trackBody!: HTMLDivElement;
+	private _trackHead!: HTMLDivElement;
 
 	constructor(table: HTMLTableElement | string, options?: ITableOptions) {
 		this.table = (
 			typeof table === 'string' ? document.querySelector(table) : table
 		) as HTMLTableElement;
 		this.options = { ...options, ...defaultOptions };
+		this.isScrollable = false;
 
 		if (!this.table || !(this.table instanceof HTMLTableElement)) {
 			throw new Error('Element not found');
@@ -38,6 +47,8 @@ export class Table {
 		// Bind events
 		this._onResize = this._onResize.bind(this);
 		this._onScroll = this._onScroll.bind(this);
+		this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
+		this._onClickButtonRight = this._onClickButtonRight.bind(this);
 
 		// Create shadow table
 		this._createShadowTable();
@@ -65,6 +76,24 @@ export class Table {
 			this._el.appendChild(this.table);
 		}
 		return this._el;
+	}
+
+	get buttonLeft() {
+		if (!this._buttonLeft) {
+			const { classButtonLeft, textButtonLeft } = this.options;
+			this._buttonLeft = this._createButton(classButtonLeft, textButtonLeft);
+			this._buttonLeft.addEventListener('click', this._onClickButtonLeft);
+		}
+		return this._buttonLeft;
+	}
+
+	get buttonRight() {
+		if (!this._buttonRight) {
+			const { classButtonRight, textButtonRight } = this.options;
+			this._buttonRight = this._createButton(classButtonRight, textButtonRight);
+			this._buttonRight.addEventListener('click', this._onClickButtonRight);
+		}
+		return this._buttonRight;
 	}
 
 	get scrollerHead() {
@@ -123,7 +152,7 @@ export class Table {
 	}
 
 	get top() {
-		if (!this._top && this.el) {
+		if (!this._top) {
 			this._top = this._createElement('div', {
 				parent: this.el,
 				insertMethod: 'before',
@@ -157,13 +186,16 @@ export class Table {
 		this._isScrollable();
 	}
 
-	// _createButton(classname: string, text: string) {
-	// 	const button = this._createElement('button', classname);
-	// 	button.type = 'button';
-	// 	button.innerHTML = `<span>${text}</span>`;
-	// 	this.trackHead?.insertBefore(button, this.trackHead.firstChild);
-	// 	return button;
-	// }
+	_createButton(className: string, text: string) {
+		const button = this._createElement('button', {
+			className,
+			parent: this.trackHead,
+			insertMethod: 'prepend',
+		});
+		button.type = 'button';
+		button.innerHTML = `<span>${text}</span>`;
+		return button;
+	}
 
 	_createElement<K extends keyof HTMLElementTagNameMap>(
 		tag: K,
@@ -188,7 +220,7 @@ export class Table {
 	}
 
 	_createShadowTable() {
-		this.shadowTable = this.el?.cloneNode(true) as HTMLElement;
+		this.shadowTable = this.table.cloneNode(true) as HTMLTableElement;
 		this.shadowTable.style.visibility = 'hidden';
 		this.shadowTable.style.position = 'absolute';
 		this.shadowTable.style.zIndex = '-2147483640';
@@ -198,17 +230,24 @@ export class Table {
 		const { clientWidth, scrollLeft, scrollWidth } = this.scrollerBody;
 		const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
 		const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
+		this.isScrollable = isScrollLeft || isScrollRight;
 
 		// Toggle scroll elements
 		this.scrollLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
 		this.scrollRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+
+		// Toggle buttons
+		if (this.options.buttons) {
+			this._toggleButton(this.buttonRight, isScrollRight);
+			this._toggleButton(this.buttonLeft, isScrollLeft);
+		}
 
 		// Sync scroll position
 		if (this.scrollerHead) this.scrollerHead.scrollLeft = scrollLeft;
 	}
 
 	_isSticky() {
-		if (!window.IntersectionObserver) return;
+		if (!window.IntersectionObserver || !this.top) return;
 
 		// Detect when headers gets sticky
 		this.observer = new window.IntersectionObserver(
@@ -224,13 +263,25 @@ export class Table {
 		this.observer.observe(this.top);
 	}
 
+	_scrollTo(left: number) {
+		const { scrollerBody } = this;
+		if ('scrollBehavior' in document.documentElement.style) {
+			scrollerBody.scrollTo({
+				behavior: 'smooth',
+				left,
+			});
+		} else {
+			scrollerBody.scrollLeft = left;
+		}
+	}
+
 	// Sync cell widths
 	_setEqualWidth() {
 		if (!this.tableHead || !this.shadowTable) return;
 
 		// Append shadow table
-		this.el?.parentNode?.insertBefore(this.shadowTable, this.el);
-		this.shadowTable.style.width = this.el?.clientWidth + 'px';
+		this.el.parentNode?.insertBefore(this.shadowTable, this.el);
+		this.shadowTable.style.width = this.el.clientWidth + 'px';
 
 		// Get elements
 		const th: HTMLTableCellElement[] = Array.from(
@@ -247,7 +298,7 @@ export class Table {
 		).map((el) => el.getBoundingClientRect().width);
 
 		// Remove shadow table
-		this.el?.parentNode?.removeChild(this.shadowTable);
+		this.el.parentNode?.removeChild(this.shadowTable);
 
 		// Set width
 		[...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
@@ -262,11 +313,28 @@ export class Table {
 		});
 	}
 
+	_toggleButton(el: HTMLButtonElement, isScroll: boolean) {
+		el.disabled = !isScroll;
+		el.style.display = this.isScrollable ? '' : 'none';
+	}
+
 	_toggleScroll(el: HTMLElement, isScroll: boolean) {
 		el.style.opacity = !isScroll ? '0' : '1';
 		// Don't overlay scrollbar
 		if (el.parentElement === this.trackBody)
 			el.style.height = `${this.tableBodyHeight}px`;
+	}
+
+	_onClickButtonLeft() {
+		const { clientWidth, scrollLeft } = this.scrollerBody;
+		this._scrollTo(scrollLeft - clientWidth * 0.75);
+		this._isScrollable();
+	}
+
+	_onClickButtonRight() {
+		const { clientWidth, scrollLeft } = this.scrollerBody;
+		this._scrollTo(scrollLeft + clientWidth * 0.75);
+		this._isScrollable();
 	}
 
 	_onResize() {

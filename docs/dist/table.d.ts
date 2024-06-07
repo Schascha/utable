@@ -1,9 +1,12 @@
 import type { ITableOptions } from './types';
 export declare class Table {
+    isScrollable: boolean;
     observer: IntersectionObserver | undefined;
     options: ITableOptions;
-    shadowTable: HTMLElement | undefined;
+    shadowTable: HTMLTableElement | undefined;
     table: HTMLTableElement;
+    private _buttonLeft;
+    private _buttonRight;
     private _el;
     private _scrollerBody;
     private _scrollerHead;
@@ -16,17 +19,20 @@ export declare class Table {
     private _trackHead;
     constructor(table: HTMLTableElement | string, options?: ITableOptions);
     get el(): HTMLDivElement;
-    get scrollerHead(): HTMLDivElement | undefined;
+    get buttonLeft(): HTMLButtonElement;
+    get buttonRight(): HTMLButtonElement;
+    get scrollerHead(): HTMLDivElement;
     get scrollerBody(): HTMLDivElement;
     get scrollLeft(): HTMLDivElement[];
     get scrollRight(): HTMLDivElement[];
     get tableBody(): HTMLTableElement;
     get tableBodyHeight(): number;
-    get tableHead(): HTMLTableElement | undefined;
-    get top(): any;
+    get tableHead(): HTMLTableElement;
+    get top(): HTMLDivElement;
     get trackBody(): HTMLDivElement;
-    get trackHead(): HTMLDivElement | undefined;
+    get trackHead(): HTMLDivElement;
     update(): void;
+    _createButton(className: string, text: string): HTMLButtonElement;
     _createElement<K extends keyof HTMLElementTagNameMap>(tag: K, options?: {
         className?: string;
         insertMethod?: 'prepend' | 'append' | 'before' | 'after';
@@ -36,9 +42,13 @@ export declare class Table {
     _createShadowTable(): void;
     _isScrollable(): void;
     _isSticky(): void;
+    _scrollTo(left: number): void;
     _setEqualWidth(): void;
     _setWidth(el: HTMLElement | HTMLElement[], width?: number | string): void;
+    _toggleButton(el: HTMLButtonElement, isScroll: boolean): void;
     _toggleScroll(el: HTMLElement, isScroll: boolean): void;
+    _onClickButtonLeft(): void;
+    _onClickButtonRight(): void;
     _onResize(): void;
     _onScroll(): void;
 }
