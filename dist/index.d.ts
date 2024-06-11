@@ -1,2 +1,66 @@
-export * from './table';
-export * from './types';
+export interface ITableOptions {
+    buttons?: boolean;
+    classButtonLeft: string;
+    classButtonRight: string;
+    classScroller: string;
+    classScrollLeft: string;
+    classScrollRight: string;
+    classSticky: string;
+    classTrack: string;
+    classWrapper: string;
+    textButtonLeft: string;
+    textButtonRight: string;
+}
+export declare class Table {
+    isScrollable: boolean;
+    observer: IntersectionObserver | undefined;
+    options: ITableOptions;
+    shadowTable: HTMLTableElement | undefined;
+    table: HTMLTableElement;
+    private _buttonLeft;
+    private _buttonRight;
+    private _el;
+    private _scrollerBody;
+    private _scrollerHead;
+    private _scrollLeft;
+    private _scrollRight;
+    private _tableBody;
+    private _tableHead;
+    private _top;
+    private _trackBody;
+    private _trackHead;
+    constructor(table: HTMLTableElement | string, options?: ITableOptions);
+    get el(): HTMLDivElement;
+    get buttonLeft(): HTMLButtonElement;
+    get buttonRight(): HTMLButtonElement;
+    get scrollerHead(): HTMLDivElement;
+    get scrollerBody(): HTMLDivElement;
+    get scrollLeft(): HTMLDivElement[];
+    get scrollRight(): HTMLDivElement[];
+    get tableBody(): HTMLTableElement;
+    get tableBodyHeight(): number;
+    get tableHead(): HTMLTableElement;
+    get top(): HTMLDivElement;
+    get trackBody(): HTMLDivElement;
+    get trackHead(): HTMLDivElement;
+    update(): void;
+    _createButton(className: string, text: string): HTMLButtonElement;
+    _createElement<K extends keyof HTMLElementTagNameMap>(tag: K, options?: {
+        className?: string;
+        insertMethod?: 'prepend' | 'append' | 'before' | 'after';
+        parent?: Element;
+    }): HTMLElementTagNameMap[K];
+    _createScrollElement(className: string): HTMLDivElement[];
+    _createShadowTable(): void;
+    _isScrollable(): void;
+    _isSticky(): void;
+    _scrollTo(left: number): void;
+    _setEqualWidth(): void;
+    _setWidth(el: HTMLElement | HTMLElement[], width?: number | string): void;
+    _toggleButton(el: HTMLButtonElement, isScroll: boolean): void;
+    _toggleScroll(el: HTMLElement, isScroll: boolean): void;
+    _onClickButtonLeft(): void;
+    _onClickButtonRight(): void;
+    _onResize(): void;
+    _onScroll(): void;
+}

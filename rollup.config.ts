@@ -7,5 +7,9 @@ export default {
 		format: 'umd',
 		name: 'Table',
 	},
-	plugins: [typescript()],
+	plugins: [
+		typescript({
+			declaration: false,
+		}),
+	],
 };
