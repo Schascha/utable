@@ -1,11 +1,11 @@
 import typescript from '@rollup/plugin-typescript';
 
 export default {
-	input: 'src/index.ts',
+	input: 'src/utable.ts',
 	output: {
-		file: 'docs/index.js',
+		file: 'docs/utable.js',
 		format: 'umd',
-		name: 'Table',
+		name: 'UTable',
 	},
 	plugins: [
 		typescript({

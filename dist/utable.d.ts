@@ -1,20 +1,8 @@
-export interface ITableOptions {
-    buttons?: boolean;
-    classButtonLeft: string;
-    classButtonRight: string;
-    classScroller: string;
-    classScrollLeft: string;
-    classScrollRight: string;
-    classSticky: string;
-    classTrack: string;
-    classWrapper: string;
-    textButtonLeft: string;
-    textButtonRight: string;
-}
-export declare class Table {
+import { IUTable, IUTableOptions } from './types';
+export declare class UTable implements IUTable {
     isScrollable: boolean;
     observer: IntersectionObserver | undefined;
-    options: ITableOptions;
+    options: IUTableOptions;
     shadowTable: HTMLTableElement | undefined;
     table: HTMLTableElement;
     private _buttonLeft;
@@ -29,20 +17,22 @@ export declare class Table {
     private _top;
     private _trackBody;
     private _trackHead;
-    constructor(table: HTMLTableElement | string, options?: ITableOptions);
+    constructor(table: HTMLTableElement | string, options?: IUTableOptions);
     get el(): HTMLDivElement;
     get buttonLeft(): HTMLButtonElement;
     get buttonRight(): HTMLButtonElement;
-    get scrollerHead(): HTMLDivElement;
+    get scrollerHead(): HTMLDivElement | undefined;
     get scrollerBody(): HTMLDivElement;
     get scrollLeft(): HTMLDivElement[];
     get scrollRight(): HTMLDivElement[];
     get tableBody(): HTMLTableElement;
     get tableBodyHeight(): number;
-    get tableHead(): HTMLTableElement;
+    get tableHead(): HTMLTableElement | undefined;
     get top(): HTMLDivElement;
     get trackBody(): HTMLDivElement;
-    get trackHead(): HTMLDivElement;
+    get trackHead(): HTMLDivElement | undefined;
+    destroy(): void;
+    render(): this;
     update(): void;
     _createButton(className: string, text: string): HTMLButtonElement;
     _createElement<K extends keyof HTMLElementTagNameMap>(tag: K, options?: {

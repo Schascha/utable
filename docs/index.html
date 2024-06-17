@@ -266,13 +266,12 @@
 		</table>
 	</body>
 
-	<script src="index.js"></script>
+	<script src="utable.js"></script>
 	<script>
-		const tables = Array.from(document.querySelectorAll('table')).map((el) => {
-			return {
-				el,
-				table: new Table.Table(el),
-			};
-		});
+		const uTable = window.UTable.UTable; // Module is namespaced in UMD build
+		const tables = Array.from(document.querySelectorAll('table')).map((el) => ({
+			el,
+			table: new uTable(el),
+		}));
 	</script>
 </html>

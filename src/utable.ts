@@ -1,18 +1,6 @@
-export interface ITableOptions {
-	buttons?: boolean;
-	classButtonLeft: string;
-	classButtonRight: string;
-	classScroller: string;
-	classScrollLeft: string;
-	classScrollRight: string;
-	classSticky: string;
-	classTrack: string;
-	classWrapper: string;
-	textButtonLeft: string;
-	textButtonRight: string;
-}
+import { IUTable, IUTableOptions } from './types';
 
-const defaultOptions: ITableOptions = {
+const defaultOptions: IUTableOptions = {
 	buttons: true,
 	classButtonLeft: 'button-left',
 	classButtonRight: 'button-right',
@@ -21,15 +9,15 @@ const defaultOptions: ITableOptions = {
 	classScrollRight: 'scroll-right',
 	classSticky: 'is-sticky',
 	classTrack: 'track',
-	classWrapper: 'table',
+	classWrapper: 'utable',
 	textButtonLeft: 'Left',
 	textButtonRight: 'Right',
 };
 
-export class Table {
+export class UTable implements IUTable {
 	isScrollable: boolean;
 	observer: IntersectionObserver | undefined;
-	options: ITableOptions;
+	options: IUTableOptions;
 	shadowTable: HTMLTableElement | undefined;
 	table: HTMLTableElement;
 	private _buttonLeft: HTMLButtonElement | undefined;
@@ -45,7 +33,7 @@ export class Table {
 	private _trackBody: HTMLDivElement | undefined;
 	private _trackHead: HTMLDivElement | undefined;
 
-	constructor(table: HTMLTableElement | string, options?: ITableOptions) {
+	constructor(table: HTMLTableElement | string, options?: IUTableOptions) {
 		this.table = (
 			typeof table === 'string' ? document.querySelector(table) : table
 		) as HTMLTableElement;

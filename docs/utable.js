@@ -1,7 +1,7 @@
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.Table = {}));
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.UTable = {}));
 })(this, (function (exports) { 'use strict';
 
     const defaultOptions = {
@@ -13,11 +13,11 @@
         classScrollRight: 'scroll-right',
         classSticky: 'is-sticky',
         classTrack: 'track',
-        classWrapper: 'table',
+        classWrapper: 'utable',
         textButtonLeft: 'Left',
         textButtonRight: 'Right',
     };
-    class Table {
+    class UTable {
         constructor(table, options) {
             this.table = (typeof table === 'string' ? document.querySelector(table) : table);
             this.options = Object.assign(Object.assign({}, options), defaultOptions);
@@ -306,6 +306,6 @@
         }
     }
 
-    exports.Table = Table;
+    exports.UTable = UTable;
 
 }));

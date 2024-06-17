@@ -7,11 +7,11 @@ const defaultOptions = {
     classScrollRight: 'scroll-right',
     classSticky: 'is-sticky',
     classTrack: 'track',
-    classWrapper: 'table',
+    classWrapper: 'utable',
     textButtonLeft: 'Left',
     textButtonRight: 'Right',
 };
-export class Table {
+export class UTable {
     constructor(table, options) {
         this.table = (typeof table === 'string' ? document.querySelector(table) : table);
         this.options = Object.assign(Object.assign({}, options), defaultOptions);
@@ -24,18 +24,7 @@ export class Table {
         this._onScroll = this._onScroll.bind(this);
         this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
         this._onClickButtonRight = this._onClickButtonRight.bind(this);
-        // Create shadow table
-        this._createShadowTable();
-        // Split table into head and body
-        if (this.trackHead) {
-            this.el.appendChild(this.trackHead);
-            this._isSticky();
-        }
-        this.el.appendChild(this.trackBody);
-        // Resize event
-        window.addEventListener('resize', this._onResize);
-        window.addEventListener('orientationchange', this._onResize);
-        this.update();
+        this.render();
     }
     get el() {
         if (!this._el) {
@@ -141,6 +130,47 @@ export class Table {
         }
         return this._trackHead;
     }
+    destroy() {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        // Unbind events
+        window.removeEventListener('resize', this._onResize);
+        window.removeEventListener('orientationchange', this._onResize);
+        (_a = this.scrollerBody) === null || _a === void 0 ? void 0 : _a.removeEventListener('scroll', this._onScroll);
+        (_b = this.buttonLeft) === null || _b === void 0 ? void 0 : _b.removeEventListener('click', this._onClickButtonLeft);
+        (_c = this.buttonRight) === null || _c === void 0 ? void 0 : _c.removeEventListener('click', this._onClickButtonRight);
+        (_d = this.observer) === null || _d === void 0 ? void 0 : _d.disconnect();
+        // Restore table
+        this.tableHead && this.table.prepend(this.tableHead.firstChild);
+        (_f = (_e = this.el) === null || _e === void 0 ? void 0 : _e.parentNode) === null || _f === void 0 ? void 0 : _f.replaceChild(this.table, this.el);
+        (_h = (_g = this.top) === null || _g === void 0 ? void 0 : _g.parentNode) === null || _h === void 0 ? void 0 : _h.removeChild(this.top);
+        // Remove private properties
+        this._el =
+            this._scrollerBody =
+                this._scrollerHead =
+                    this._tableBody =
+                        this._tableHead =
+                            this._top =
+                                this._trackBody =
+                                    this._trackHead =
+                                        this._buttonLeft =
+                                            this._buttonRight =
+                                                undefined;
+    }
+    render() {
+        // Create shadow table
+        this._createShadowTable();
+        // Split table into head and body
+        if (this.trackHead) {
+            this.el.appendChild(this.trackHead);
+            this._isSticky();
+        }
+        this.el.appendChild(this.trackBody);
+        // Resize event
+        window.addEventListener('resize', this._onResize);
+        window.addEventListener('orientationchange', this._onResize);
+        this.update();
+        return this;
+    }
     update() {
         this._setEqualWidth();
         this._isScrollable();
@@ -223,7 +253,7 @@ export class Table {
             return;
         // Append shadow table
         (_a = this.el.parentNode) === null || _a === void 0 ? void 0 : _a.insertBefore(this.shadowTable, this.el);
-        this.shadowTable.style.width = this.el.clientWidth + 'px';
+        this.shadowTable.style.width = `${this.el.clientWidth}px`;
         // Get elements
         const th = Array.from(this.tableHead.querySelectorAll('tr > *'));
         const td = Array.from(this.tableBody.querySelectorAll('tr:first-child > *'));

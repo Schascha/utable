@@ -1,5 +1,5 @@
 {
-  "name": "table",
+  "name": "utable",
   "version": "1.0.0",
   "main": "src/index.ts",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "author": "Sascha Künstler <contact.schascha@gmail.com> (https://www.schaschaweb.de)",
   "license": "MIT",
-  "description": "",
+  "description": "Just a responsive table plugin",
   "devDependencies": {
     "@babel/cli": "^7.24.5",
     "@babel/core": "^7.24.5",
@@ -16,7 +16,6 @@
     "@babel/preset-typescript": "^7.24.1",
     "@rollup/plugin-typescript": "^11.1.6",
     "rollup": "^4.18.0",
-    "tslib": "^2.6.2",
     "typescript": "^5.4.5"
   }
 }
