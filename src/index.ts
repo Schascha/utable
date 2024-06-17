@@ -32,18 +32,18 @@ export class Table {
 	options: ITableOptions;
 	shadowTable: HTMLTableElement | undefined;
 	table: HTMLTableElement;
-	private _buttonLeft!: HTMLButtonElement;
-	private _buttonRight!: HTMLButtonElement;
-	private _el!: HTMLDivElement;
-	private _scrollerBody!: HTMLDivElement;
-	private _scrollerHead!: HTMLDivElement;
-	private _scrollLeft!: HTMLDivElement[];
-	private _scrollRight!: HTMLDivElement[];
-	private _tableBody!: HTMLTableElement;
-	private _tableHead!: HTMLTableElement;
-	private _top!: HTMLDivElement;
-	private _trackBody!: HTMLDivElement;
-	private _trackHead!: HTMLDivElement;
+	private _buttonLeft: HTMLButtonElement | undefined;
+	private _buttonRight: HTMLButtonElement | undefined;
+	private _el: HTMLDivElement | undefined;
+	private _scrollerBody: HTMLDivElement | undefined;
+	private _scrollerHead: HTMLDivElement | undefined;
+	private _scrollLeft: HTMLDivElement[] | undefined;
+	private _scrollRight: HTMLDivElement[] | undefined;
+	private _tableBody: HTMLTableElement | undefined;
+	private _tableHead: HTMLTableElement | undefined;
+	private _top: HTMLDivElement | undefined;
+	private _trackBody: HTMLDivElement | undefined;
+	private _trackHead: HTMLDivElement | undefined;
 
 	constructor(table: HTMLTableElement | string, options?: ITableOptions) {
 		this.table = (
@@ -62,20 +62,7 @@ export class Table {
 		this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
 		this._onClickButtonRight = this._onClickButtonRight.bind(this);
 
-		// Create shadow table
-		this._createShadowTable();
-
-		// Split table into head and body
-		if (this.trackHead) {
-			this.el.appendChild(this.trackHead);
-			this._isSticky();
-		}
-		this.el.appendChild(this.trackBody);
-
-		// Resize event
-		window.addEventListener('resize', this._onResize);
-		window.addEventListener('orientationchange', this._onResize);
-		this.update();
+		this.render();
 	}
 
 	get el() {
@@ -193,6 +180,53 @@ export class Table {
 		return this._trackHead;
 	}
 
+	destroy() {
+		// Unbind events
+		window.removeEventListener('resize', this._onResize);
+		window.removeEventListener('orientationchange', this._onResize);
+		this.scrollerBody?.removeEventListener('scroll', this._onScroll);
+		this.buttonLeft?.removeEventListener('click', this._onClickButtonLeft);
+		this.buttonRight?.removeEventListener('click', this._onClickButtonRight);
+		this.observer?.disconnect();
+
+		// Restore table
+		this.tableHead && this.table.prepend(this.tableHead.firstChild!);
+		this.el?.parentNode?.replaceChild(this.table, this.el);
+		this.top?.parentNode?.removeChild(this.top);
+
+		// Remove private properties
+		this._el =
+			this._scrollerBody =
+			this._scrollerHead =
+			this._tableBody =
+			this._tableHead =
+			this._top =
+			this._trackBody =
+			this._trackHead =
+			this._buttonLeft =
+			this._buttonRight =
+				undefined;
+	}
+
+	render() {
+		// Create shadow table
+		this._createShadowTable();
+
+		// Split table into head and body
+		if (this.trackHead) {
+			this.el.appendChild(this.trackHead);
+			this._isSticky();
+		}
+		this.el.appendChild(this.trackBody);
+
+		// Resize event
+		window.addEventListener('resize', this._onResize);
+		window.addEventListener('orientationchange', this._onResize);
+		this.update();
+
+		return this;
+	}
+
 	update() {
 		this._setEqualWidth();
 		this._isScrollable();
@@ -293,7 +327,7 @@ export class Table {
 
 		// Append shadow table
 		this.el.parentNode?.insertBefore(this.shadowTable, this.el);
-		this.shadowTable.style.width = this.el.clientWidth + 'px';
+		this.shadowTable.style.width = `${this.el.clientWidth}px`;
 
 		// Get elements
 		const th: HTMLTableCellElement[] = Array.from(
