@@ -113,7 +113,7 @@
             if (!this._top) {
                 this._top = this._createElement('div', {
                     parent: this.el,
-                    insertMethod: 'before',
+                    insertMethod: 'prepend',
                 });
             }
             return this._top;
@@ -121,7 +121,7 @@
         get trackBody() {
             if (!this._trackBody) {
                 this._trackBody = this._createElement('div', {
-                    className: this.options.classTrack,
+                    className: `${this.options.classTrack} tbody`,
                 });
                 this._trackBody.appendChild(this.scrollerBody);
             }
@@ -130,7 +130,7 @@
         get trackHead() {
             if (!this._trackHead && this.scrollerHead) {
                 this._trackHead = this._createElement('div', {
-                    className: this.options.classTrack,
+                    className: `${this.options.classTrack} thead`,
                 });
                 this._trackHead.appendChild(this.scrollerHead);
             }

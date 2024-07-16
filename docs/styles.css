@@ -73,22 +73,22 @@ p {
 
 	& .track {
 		position: relative;
+	}
 
-		&:not(:only-child):first-child {
-			display: flex;
-			justify-content: flex-end;
-			flex-wrap: wrap;
-			position: sticky;
-			top: 0;
-			background-color: white;
-			z-index: 3;
+	& .thead {
+		display: flex;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+		position: sticky;
+		top: 0;
+		background-color: white;
+		z-index: 3;
 
-			& .scroller {
-				overflow-x: hidden;
+		& .scroller {
+			overflow-x: hidden;
 
-				&::-webkit-scrollbar {
-					display: none;
-				}
+			&::-webkit-scrollbar {
+				display: none;
 			}
 		}
 
