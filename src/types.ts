@@ -6,11 +6,12 @@ export interface IUTable {
 
 export interface IUTableOptions {
 	buttons?: boolean;
+	overlays?: boolean;
 	classButtonLeft: string;
 	classButtonRight: string;
+	classOverlayLeft: string;
+	classOverlayRight: string;
 	classScroller: string;
-	classScrollLeft: string;
-	classScrollRight: string;
 	classSticky: string;
 	classTrack: string;
 	classWrapper: string;

@@ -1,18 +1,5 @@
+import { UTableDefaults } from './defaults';
 import { IUTable, IUTableOptions } from './types';
-
-const defaultOptions: IUTableOptions = {
-	buttons: true,
-	classButtonLeft: 'button-left',
-	classButtonRight: 'button-right',
-	classScroller: 'scroller',
-	classScrollLeft: 'scroll-left',
-	classScrollRight: 'scroll-right',
-	classSticky: 'is-sticky',
-	classTrack: 'track',
-	classWrapper: 'utable',
-	textButtonLeft: 'Left',
-	textButtonRight: 'Right',
-};
 
 export class UTable implements IUTable {
 	isScrollable: boolean;
@@ -25,19 +12,22 @@ export class UTable implements IUTable {
 	private _el: HTMLDivElement | undefined;
 	private _scrollerBody: HTMLDivElement | undefined;
 	private _scrollerHead: HTMLDivElement | undefined;
-	private _scrollLeft: HTMLDivElement[] | undefined;
-	private _scrollRight: HTMLDivElement[] | undefined;
+	private _overlayLeft: HTMLDivElement[] | undefined;
+	private _overlayRight: HTMLDivElement[] | undefined;
 	private _tableBody: HTMLTableElement | undefined;
 	private _tableHead: HTMLTableElement | undefined;
 	private _top: HTMLDivElement | undefined;
 	private _trackBody: HTMLDivElement | undefined;
 	private _trackHead: HTMLDivElement | undefined;
 
-	constructor(table: HTMLTableElement | string, options?: IUTableOptions) {
+	constructor(
+		table: HTMLTableElement | string,
+		options?: Partial<IUTableOptions>
+	) {
 		this.table = (
 			typeof table === 'string' ? document.querySelector(table) : table
 		) as HTMLTableElement;
-		this.options = { ...options, ...defaultOptions };
+		this.options = { ...UTableDefaults, ...options };
 		this.isScrollable = false;
 
 		if (!this.table || !(this.table instanceof HTMLTableElement)) {
@@ -104,18 +94,16 @@ export class UTable implements IUTable {
 		return this._scrollerBody;
 	}
 
-	get scrollLeft() {
-		this._scrollLeft =
-			this._scrollLeft ||
-			this._createScrollElement(this.options.classScrollLeft);
-		return this._scrollLeft;
+	get overlayLeft() {
+		this._overlayLeft =
+			this._overlayLeft || this._createOverlay(this.options.classOverlayLeft);
+		return this._overlayLeft;
 	}
 
-	get scrollRight() {
-		this._scrollRight =
-			this._scrollRight ||
-			this._createScrollElement(this.options.classScrollRight);
-		return this._scrollRight;
+	get overlayRight() {
+		this._overlayRight =
+			this._overlayRight || this._createOverlay(this.options.classOverlayRight);
+		return this._overlayRight;
 	}
 
 	get tableBody() {
@@ -193,6 +181,8 @@ export class UTable implements IUTable {
 			this._trackHead =
 			this._buttonLeft =
 			this._buttonRight =
+			this._overlayLeft =
+			this._overlayRight =
 				undefined;
 	}
 
@@ -246,7 +236,7 @@ export class UTable implements IUTable {
 		return el;
 	}
 
-	_createScrollElement(className: string) {
+	_createOverlay(className: string) {
 		const { _createElement: $, trackBody, trackHead } = this;
 		const el = [$('div', { className, parent: trackBody })];
 		trackHead && el.push($('div', { className, parent: trackHead }));
@@ -266,9 +256,11 @@ export class UTable implements IUTable {
 		const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
 		this.isScrollable = isScrollLeft || isScrollRight;
 
-		// Toggle scroll elements
-		this.scrollLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
-		this.scrollRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+		// Toggle overlays
+		if (this.options.overlays) {
+			this.overlayLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
+			this.overlayRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+		}
 
 		// Toggle buttons
 		if (this.options.buttons) {
@@ -314,7 +306,7 @@ export class UTable implements IUTable {
 		if (!this.tableHead || !this.shadowTable) return;
 
 		// Append shadow table
-		this.el.parentNode?.insertBefore(this.shadowTable, this.el);
+		this.el.prepend(this.shadowTable);
 		this.shadowTable.style.width = `${this.el.clientWidth}px`;
 
 		// Get elements
@@ -332,7 +324,7 @@ export class UTable implements IUTable {
 		).map((el) => el.getBoundingClientRect().width);
 
 		// Remove shadow table
-		this.el.parentNode?.removeChild(this.shadowTable);
+		this.el.removeChild(this.shadowTable);
 
 		// Set width
 		[...th].forEach((el, index) => this._setWidth(el, thShadow[index]));

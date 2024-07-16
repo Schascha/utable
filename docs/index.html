@@ -264,6 +264,62 @@
 				</tr>
 			</tbody>
 		</table>
+
+		<h2>Without buttons and overlays</h2>
+		<table class="no-buttons no-overlays">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Age</th>
+					<th>Role</th>
+					<th>Species</th>
+					<th>Origin</th>
+					<th>Weapon</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Frodo Baggins</td>
+					<td>50</td>
+					<td>Ring bearer</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+					<td>Sting</td>
+				</tr>
+				<tr>
+					<td>Samwise Gamgee</td>
+					<td>38</td>
+					<td>Gardener</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+					<td>Barrow-blade</td>
+				</tr>
+				<tr>
+					<td>Meriadoc Brandybuck</td>
+					<td>36</td>
+					<td>Adventurer</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+					<td>Barrow-blade</td>
+				</tr>
+				<tr>
+					<td>Peregrin Took</td>
+					<td>28</td>
+					<td>Adventurer</td>
+					<td>Hobbit</td>
+					<td>Shire</td>
+					<td>Barrow-blade</td>
+				</tr>
+				<tr>
+					<td>Aragorn</td>
+					<td>88</td>
+					<td>Ranger</td>
+					<td>Human</td>
+					<td>Arnor</td>
+					<td>Anduril</td>
+				</tr>
+			</tbody>
+		</table>
 	</body>
 
 	<script src="utable.js"></script>
@@ -271,7 +327,10 @@
 		const uTable = window.UTable.UTable; // Module is namespaced in UMD build
 		const tables = Array.from(document.querySelectorAll('table')).map((el) => ({
 			el,
-			table: new uTable(el),
+			table: new uTable(el, {
+				buttons: el.classList.contains('no-buttons') ? false : true,
+				overlays: el.classList.contains('no-overlays') ? false : true,
+			}),
 		}));
 	</script>
 </html>

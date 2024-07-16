@@ -4,23 +4,25 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.UTable = {}));
 })(this, (function (exports) { 'use strict';
 
-    const defaultOptions = {
+    const UTableDefaults = {
         buttons: true,
+        overlays: true,
         classButtonLeft: 'button-left',
         classButtonRight: 'button-right',
+        classOverlayLeft: 'scroll-left',
+        classOverlayRight: 'scroll-right',
         classScroller: 'scroller',
-        classScrollLeft: 'scroll-left',
-        classScrollRight: 'scroll-right',
         classSticky: 'is-sticky',
         classTrack: 'track',
         classWrapper: 'utable',
         textButtonLeft: 'Left',
         textButtonRight: 'Right',
     };
+
     class UTable {
         constructor(table, options) {
             this.table = (typeof table === 'string' ? document.querySelector(table) : table);
-            this.options = Object.assign(Object.assign({}, options), defaultOptions);
+            this.options = Object.assign(Object.assign({}, UTableDefaults), options);
             this.isScrollable = false;
             if (!this.table || !(this.table instanceof HTMLTableElement)) {
                 throw new Error('Element not found');
@@ -78,17 +80,15 @@
             }
             return this._scrollerBody;
         }
-        get scrollLeft() {
-            this._scrollLeft =
-                this._scrollLeft ||
-                    this._createScrollElement(this.options.classScrollLeft);
-            return this._scrollLeft;
+        get overlayLeft() {
+            this._overlayLeft =
+                this._overlayLeft || this._createOverlay(this.options.classOverlayLeft);
+            return this._overlayLeft;
         }
-        get scrollRight() {
-            this._scrollRight =
-                this._scrollRight ||
-                    this._createScrollElement(this.options.classScrollRight);
-            return this._scrollRight;
+        get overlayRight() {
+            this._overlayRight =
+                this._overlayRight || this._createOverlay(this.options.classOverlayRight);
+            return this._overlayRight;
         }
         get tableBody() {
             this._tableBody = this._tableBody || this.table;
@@ -160,7 +160,9 @@
                                         this._trackHead =
                                             this._buttonLeft =
                                                 this._buttonRight =
-                                                    undefined;
+                                                    this._overlayLeft =
+                                                        this._overlayRight =
+                                                            undefined;
         }
         render() {
             // Create shadow table
@@ -200,7 +202,7 @@
                 parent[insertMethod || 'append'](el);
             return el;
         }
-        _createScrollElement(className) {
+        _createOverlay(className) {
             const { _createElement: $, trackBody, trackHead } = this;
             const el = [$('div', { className, parent: trackBody })];
             trackHead && el.push($('div', { className, parent: trackHead }));
@@ -217,9 +219,11 @@
             const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
             const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
             this.isScrollable = isScrollLeft || isScrollRight;
-            // Toggle scroll elements
-            this.scrollLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
-            this.scrollRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+            // Toggle overlays
+            if (this.options.overlays) {
+                this.overlayLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
+                this.overlayRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+            }
             // Toggle buttons
             if (this.options.buttons) {
                 this._toggleButton(this.buttonRight, isScrollRight);
@@ -254,11 +258,10 @@
         }
         // Sync cell widths
         _setEqualWidth() {
-            var _a, _b;
             if (!this.tableHead || !this.shadowTable)
                 return;
             // Append shadow table
-            (_a = this.el.parentNode) === null || _a === void 0 ? void 0 : _a.insertBefore(this.shadowTable, this.el);
+            this.el.prepend(this.shadowTable);
             this.shadowTable.style.width = `${this.el.clientWidth}px`;
             // Get elements
             const th = Array.from(this.tableHead.querySelectorAll('tr > *'));
@@ -266,7 +269,7 @@
             const thShadow = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
             const tdShadow = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
             // Remove shadow table
-            (_b = this.el.parentNode) === null || _b === void 0 ? void 0 : _b.removeChild(this.shadowTable);
+            this.el.removeChild(this.shadowTable);
             // Set width
             [...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
             [...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
