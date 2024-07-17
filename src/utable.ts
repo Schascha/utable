@@ -48,7 +48,7 @@ export class UTable implements IUTable {
 		this.render();
 	}
 
-	get el() {
+	get el(): HTMLDivElement {
 		if (!this._.el) {
 			this._.el = this._createElement('div', {
 				className: this.options.classWrapper,
@@ -60,7 +60,7 @@ export class UTable implements IUTable {
 		return this._.el;
 	}
 
-	get buttonLeft() {
+	get buttonLeft(): HTMLButtonElement {
 		if (!this._.buttonLeft) {
 			const { classButtonLeft, textButtonLeft, titleButtonLeft } = this.options;
 			this._.buttonLeft = this._createButton(
@@ -73,7 +73,7 @@ export class UTable implements IUTable {
 		return this._.buttonLeft;
 	}
 
-	get buttonRight() {
+	get buttonRight(): HTMLButtonElement {
 		if (!this._.buttonRight) {
 			const { classButtonRight, textButtonRight, titleButtonRight } =
 				this.options;
@@ -87,7 +87,7 @@ export class UTable implements IUTable {
 		return this._.buttonRight;
 	}
 
-	get scrollerHead() {
+	get scrollerHead(): HTMLDivElement | undefined {
 		if (!this._.scrollerHead && this.tableHead) {
 			this._.scrollerHead = this._createElement('div', {
 				className: this.options.classScroller,
@@ -97,7 +97,7 @@ export class UTable implements IUTable {
 		return this._.scrollerHead;
 	}
 
-	get scrollerBody() {
+	get scrollerBody(): HTMLDivElement {
 		if (!this._.scrollerBody) {
 			this._.scrollerBody = this._createElement('div', {
 				className: this.options.classScroller,
@@ -108,29 +108,29 @@ export class UTable implements IUTable {
 		return this._.scrollerBody;
 	}
 
-	get overlayLeft() {
+	get overlayLeft(): HTMLDivElement[] {
 		this._.overlayLeft =
 			this._.overlayLeft || this._createOverlay(this.options.classOverlayLeft);
 		return this._.overlayLeft;
 	}
 
-	get overlayRight() {
+	get overlayRight(): HTMLDivElement[] {
 		this._.overlayRight =
 			this._.overlayRight ||
 			this._createOverlay(this.options.classOverlayRight);
 		return this._.overlayRight;
 	}
 
-	get tableBody() {
+	get tableBody(): HTMLTableElement {
 		this._.tableBody = this._.tableBody || this.table;
 		return this._.tableBody;
 	}
 
-	get tableBodyHeight() {
+	get tableBodyHeight(): number {
 		return this.tableBody?.offsetHeight || 0;
 	}
 
-	get tableHead() {
+	get tableHead(): HTMLTableElement | null {
 		if (typeof this._.tableHead === 'undefined') {
 			const thead = this.el?.querySelector('thead');
 			if (thead) {
@@ -143,9 +143,20 @@ export class UTable implements IUTable {
 		return this._.tableHead;
 	}
 
-	get top() {
+	get td(): HTMLTableCellElement[] {
+		const { table } = this;
+		return Array.from(table.querySelectorAll('table > tr > *, tbody > tr > *'));
+	}
+
+	get th(): HTMLTableCellElement[] {
+		const { tableHead } = this;
+		return tableHead ? Array.from(tableHead.querySelectorAll('tr > *')) : [];
+	}
+
+	get top(): HTMLDivElement {
 		if (!this._.top) {
 			this._.top = this._createElement('div', {
+				className: this.options.classTop,
 				parent: this.el,
 				insertMethod: 'prepend',
 			});
@@ -153,7 +164,7 @@ export class UTable implements IUTable {
 		return this._.top;
 	}
 
-	get trackBody() {
+	get trackBody(): HTMLDivElement {
 		if (!this._.trackBody) {
 			this._.trackBody = this._createElement('div', {
 				className: `${this.options.classTrack} tbody`,
@@ -163,7 +174,7 @@ export class UTable implements IUTable {
 		return this._.trackBody;
 	}
 
-	get trackHead() {
+	get trackHead(): HTMLDivElement | undefined {
 		if (!this._.trackHead && this.scrollerHead) {
 			this._.trackHead = this._createElement('div', {
 				className: `${this.options.classTrack} thead`,
@@ -184,6 +195,8 @@ export class UTable implements IUTable {
 		this.observer?.disconnect();
 
 		// Restore table
+		this.th.forEach((el) => this._setWidth(el));
+		this.td.forEach((el) => this._setWidth(el));
 		this.tableHead?.firstChild && this.table.prepend(this.tableHead.firstChild);
 		this.el?.parentNode?.replaceChild(this.table, this.el);
 		this.top?.parentNode?.removeChild(this.top);
@@ -333,20 +346,20 @@ export class UTable implements IUTable {
 	 * @private
 	 */
 	_isSticky() {
-		if (!window.IntersectionObserver || !this.top || !this.trackHead) return;
+		const { options, top, trackHead } = this;
+		const { classSticky, sticky } = options;
+
+		if (!sticky || !window.IntersectionObserver || !top || !trackHead) return;
 
 		// Detect when headers gets sticky
 		this.observer = new window.IntersectionObserver(
 			([e]) =>
-				this.trackHead?.classList.toggle(
-					this.options.classSticky,
-					e.intersectionRatio < 1
-				),
+				trackHead?.classList.toggle(classSticky, e.intersectionRatio < 1),
 			{ threshold: [1] }
 		);
 
 		// Observe top element
-		this.observer.observe(this.top);
+		this.observer.observe(top);
 	}
 
 	/**
@@ -377,13 +390,7 @@ export class UTable implements IUTable {
 		this.el.prepend(this.shadowTable);
 		this.shadowTable.style.width = `${this.el.clientWidth}px`;
 
-		// Get elements
-		const th: HTMLTableCellElement[] = Array.from(
-			this.tableHead.querySelectorAll('tr > *')
-		);
-		const td: HTMLTableCellElement[] = Array.from(
-			this.tableBody.querySelectorAll('tr:first-child > *')
-		);
+		// Get cell widths
 		const _th = Array.from(
 			this.shadowTable.querySelectorAll('thead > tr > *')
 		).map((el) => el.getBoundingClientRect().width);
@@ -395,8 +402,8 @@ export class UTable implements IUTable {
 		this.el.removeChild(this.shadowTable);
 
 		// Set width
-		th.forEach((el, index) => this._setWidth(el, _th[index]));
-		td.forEach((el, index) => this._setWidth(el, _td[index]));
+		this.th.forEach((el, index) => this._setWidth(el, _th[index]));
+		this.td.forEach((el, index) => this._setWidth(el, _td[index]));
 	}
 
 	/**

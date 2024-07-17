@@ -266,7 +266,7 @@
 		</table>
 
 		<h2>Without buttons and overlays</h2>
-		<table class="no-buttons no-overlays">
+		<table class="no-buttons no-overlays no-sticky">
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -330,6 +330,7 @@
 			table: new uTable(el, {
 				buttons: el.classList.contains('no-buttons') ? false : true,
 				overlays: el.classList.contains('no-overlays') ? false : true,
+				sticky: el.classList.contains('sticky') ? true : false,
 			}),
 		}));
 	</script>

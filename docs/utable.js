@@ -4,9 +4,30 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.UTable = {}));
 })(this, (function (exports) { 'use strict';
 
+    /**
+     * Default options for UTable
+     * @type {IUTableOptions}
+     * @props {boolean} buttons - Enable or disable buttons
+     * @props {boolean} overlays - Enable or disable overlays
+     * @props {boolean} sticky - Enable or disable sticky observer
+     * @props {string} classButtonLeft - Class name for left button
+     * @props {string} classButtonRight - Class name for right button
+     * @props {string} classOverlayLeft - Class name for left overlay
+     * @props {string} classOverlayRight - Class name for right overlay
+     * @props {string} classScroller - Class name for scroller
+     * @props {string} classSticky - Class name if table header is sticky
+     * @props {string} classTop - Class name for top element
+     * @props {string} classTrack - Class name for track element
+     * @props {string} classWrapper - Class name for wrapper element
+     * @props {string} textButtonLeft - Text for left button
+     * @props {string} textButtonRight - Text for right button
+     * @props {string} titleButtonLeft - Title for left button
+     * @props {string} titleButtonRight - Title for right button
+     */
     const UTableDefaults = {
         buttons: true,
         overlays: true,
+        sticky: true,
         classButtonLeft: 'button-left',
         classButtonRight: 'button-right',
         classOverlayLeft: 'scroll-left',
@@ -14,6 +35,7 @@
         classScroller: 'scroller',
         classSticky: 'is-sticky',
         classTrack: 'track',
+        classTop: 'top',
         classWrapper: 'utable',
         textButtonLeft: 'Left',
         textButtonRight: 'Right',
@@ -115,9 +137,18 @@
             }
             return this._.tableHead;
         }
+        get td() {
+            const { table } = this;
+            return Array.from(table.querySelectorAll('table > tr > *, tbody > tr > *'));
+        }
+        get th() {
+            const { tableHead } = this;
+            return tableHead ? Array.from(tableHead.querySelectorAll('tr > *')) : [];
+        }
         get top() {
             if (!this._.top) {
                 this._.top = this._createElement('div', {
+                    className: this.options.classTop,
                     parent: this.el,
                     insertMethod: 'prepend',
                 });
@@ -153,6 +184,8 @@
             (_c = this.buttonRight) === null || _c === void 0 ? void 0 : _c.removeEventListener('click', this._onClickButtonRight);
             (_d = this.observer) === null || _d === void 0 ? void 0 : _d.disconnect();
             // Restore table
+            this.th.forEach((el) => this._setWidth(el));
+            this.td.forEach((el) => this._setWidth(el));
             ((_e = this.tableHead) === null || _e === void 0 ? void 0 : _e.firstChild) && this.table.prepend(this.tableHead.firstChild);
             (_g = (_f = this.el) === null || _f === void 0 ? void 0 : _f.parentNode) === null || _g === void 0 ? void 0 : _g.replaceChild(this.table, this.el);
             (_j = (_h = this.top) === null || _h === void 0 ? void 0 : _h.parentNode) === null || _j === void 0 ? void 0 : _j.removeChild(this.top);
@@ -279,15 +312,14 @@
          * @private
          */
         _isSticky() {
-            if (!window.IntersectionObserver || !this.top || !this.trackHead)
+            const { options, top, trackHead } = this;
+            const { classSticky, sticky } = options;
+            if (!sticky || !window.IntersectionObserver || !top || !trackHead)
                 return;
             // Detect when headers gets sticky
-            this.observer = new window.IntersectionObserver(([e]) => {
-                var _a;
-                return (_a = this.trackHead) === null || _a === void 0 ? void 0 : _a.classList.toggle(this.options.classSticky, e.intersectionRatio < 1);
-            }, { threshold: [1] });
+            this.observer = new window.IntersectionObserver(([e]) => trackHead === null || trackHead === void 0 ? void 0 : trackHead.classList.toggle(classSticky, e.intersectionRatio < 1), { threshold: [1] });
             // Observe top element
-            this.observer.observe(this.top);
+            this.observer.observe(top);
         }
         /**
          * Scroll to position
@@ -316,16 +348,14 @@
             // Append shadow table
             this.el.prepend(this.shadowTable);
             this.shadowTable.style.width = `${this.el.clientWidth}px`;
-            // Get elements
-            const th = Array.from(this.tableHead.querySelectorAll('tr > *'));
-            const td = Array.from(this.tableBody.querySelectorAll('tr:first-child > *'));
+            // Get cell widths
             const _th = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
             const _td = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
             // Remove shadow table
             this.el.removeChild(this.shadowTable);
             // Set width
-            th.forEach((el, index) => this._setWidth(el, _th[index]));
-            td.forEach((el, index) => this._setWidth(el, _td[index]));
+            this.th.forEach((el, index) => this._setWidth(el, _th[index]));
+            this.td.forEach((el, index) => this._setWidth(el, _td[index]));
         }
         /**
          * Set width to elements

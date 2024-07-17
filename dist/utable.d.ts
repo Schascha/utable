@@ -17,6 +17,8 @@ export declare class UTable implements IUTable {
     get tableBody(): HTMLTableElement;
     get tableBodyHeight(): number;
     get tableHead(): HTMLTableElement | null;
+    get td(): HTMLTableCellElement[];
+    get th(): HTMLTableCellElement[];
     get top(): HTMLDivElement;
     get trackBody(): HTMLDivElement;
     get trackHead(): HTMLDivElement | undefined;
