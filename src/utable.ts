@@ -17,7 +17,7 @@ export class UTable implements IUTable {
 		scrollerBody?: HTMLDivElement;
 		scrollerHead?: HTMLDivElement;
 		tableBody?: HTMLTableElement;
-		tableHead?: HTMLTableElement;
+		tableHead?: HTMLTableElement | null;
 		top?: HTMLDivElement;
 		trackBody?: HTMLDivElement;
 		trackHead?: HTMLDivElement;
@@ -34,6 +34,7 @@ export class UTable implements IUTable {
 		this._ = {};
 		this.isScrollable = false;
 
+		// Check if table exists
 		if (!this.table || !(this.table instanceof HTMLTableElement)) {
 			throw new Error('Element not found');
 		}
@@ -130,11 +131,13 @@ export class UTable implements IUTable {
 	}
 
 	get tableHead() {
-		if (!this._.tableHead) {
+		if (typeof this._.tableHead === 'undefined') {
 			const thead = this.el?.querySelector('thead');
 			if (thead) {
 				this._.tableHead = document.createElement('table');
 				this._.tableHead.appendChild(thead);
+			} else {
+				this._.tableHead = thead;
 			}
 		}
 		return this._.tableHead;
@@ -166,6 +169,7 @@ export class UTable implements IUTable {
 				className: `${this.options.classTrack} thead`,
 			});
 			this._.trackHead.appendChild(this.scrollerHead);
+			this.el.appendChild(this._.trackHead);
 		}
 		return this._.trackHead;
 	}
@@ -180,7 +184,7 @@ export class UTable implements IUTable {
 		this.observer?.disconnect();
 
 		// Restore table
-		this.tableHead && this.table.prepend(this.tableHead.firstChild!);
+		this.tableHead?.firstChild && this.table.prepend(this.tableHead.firstChild);
 		this.el?.parentNode?.replaceChild(this.table, this.el);
 		this.top?.parentNode?.removeChild(this.top);
 
@@ -188,36 +192,54 @@ export class UTable implements IUTable {
 		this._ = {};
 	}
 
-	render() {
+	/**
+	 * Render method
+	 * This method should be called to initialize the table
+	 * @returns {this} - Table instance
+	 */
+	render(): this {
 		// Create shadow table
 		this._createShadowTable();
 
-		// Split table into head and body
-		if (this.trackHead) {
-			this.el.appendChild(this.trackHead);
-			this._isSticky();
-		}
+		// Append elements
+		this._isSticky();
 		this.el.appendChild(this.trackBody);
 
 		// Resize event
 		window.addEventListener('resize', this._onResize);
 		window.addEventListener('orientationchange', this._onResize);
-		this.update();
+		return this.update();
+	}
 
+	/**
+	 * Update method
+	 * This method should be called when the table is updated
+	 * @returns {this} - Table instance
+	 */
+	update(): this {
+		// Fall back to render method
+		if (!Object.keys(this._).length) {
+			return this.render();
+		}
+		this._setEqualWidth();
+		this._isScrollable();
 		return this;
 	}
 
-	update() {
-		this._setEqualWidth();
-		this._isScrollable();
-	}
-
+	/**
+	 * Create button
+	 * @param {string} className - Button class name
+	 * @param {string} text - Button text
+	 * @param {string} title - Button title
+	 * @param {() => void} event - Button click event
+	 * @returns {HTMLButtonElement} - Button element
+	 */
 	_createButton(
 		className: string,
 		text: string,
 		title: string,
 		event: () => void
-	) {
+	): HTMLButtonElement {
 		const button = this._createElement('button', {
 			className,
 			parent: this.trackHead,
@@ -230,6 +252,16 @@ export class UTable implements IUTable {
 		return button;
 	}
 
+	/**
+	 * Create element
+	 * @param {K} tag
+	 * @param {Object} options - Element options
+	 * @param {string} options.className - Element class name
+	 * @param {string} options.insertMethod - Insert method, default is append
+	 * @param {Element} options.parent - Parent element
+	 * @private
+	 * @returns {HTMLElementTagNameMap[K]} - Element
+	 */
 	_createElement<K extends keyof HTMLElementTagNameMap>(
 		tag: K,
 		options: {
@@ -245,13 +277,24 @@ export class UTable implements IUTable {
 		return el;
 	}
 
-	_createOverlay(className: string) {
+	/**
+	 * Create overlay
+	 * @param {string} className - Overlay class name
+	 * @private
+	 * @returns {HTMLDivElement[]} - Overlay elements
+	 */
+	_createOverlay(className: string): HTMLDivElement[] {
 		const { _createElement: $, trackBody, trackHead } = this;
 		const el = [$('div', { className, parent: trackBody })];
 		trackHead && el.push($('div', { className, parent: trackHead }));
 		return el;
 	}
 
+	/**
+	 * Create shadow table
+	 * This table is a copy of the original table and is used to calculate the width of the cells
+	 * @private
+	 */
 	_createShadowTable() {
 		this.shadowTable = this.table.cloneNode(true) as HTMLTableElement;
 		this.shadowTable.style.visibility = 'hidden';
@@ -259,6 +302,10 @@ export class UTable implements IUTable {
 		this.shadowTable.style.zIndex = '-2147483640';
 	}
 
+	/**
+	 * Check if table is scrollable
+	 * @private
+	 */
 	_isScrollable() {
 		const { clientWidth, scrollLeft, scrollWidth } = this.scrollerBody;
 		const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
@@ -267,8 +314,8 @@ export class UTable implements IUTable {
 
 		// Toggle overlays
 		if (this.options.overlays) {
-			this.overlayLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
-			this.overlayRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+			this.overlayLeft.forEach((el) => this._toggleOverlay(el, isScrollLeft));
+			this.overlayRight.forEach((el) => this._toggleOverlay(el, isScrollRight));
 		}
 
 		// Toggle buttons
@@ -281,8 +328,12 @@ export class UTable implements IUTable {
 		if (this.scrollerHead) this.scrollerHead.scrollLeft = scrollLeft;
 	}
 
+	/**
+	 * Sticky header
+	 * @private
+	 */
 	_isSticky() {
-		if (!window.IntersectionObserver || !this.top) return;
+		if (!window.IntersectionObserver || !this.top || !this.trackHead) return;
 
 		// Detect when headers gets sticky
 		this.observer = new window.IntersectionObserver(
@@ -298,6 +349,11 @@ export class UTable implements IUTable {
 		this.observer.observe(this.top);
 	}
 
+	/**
+	 * Scroll to position
+	 * @param {number} left - Scroll left position
+	 * @private
+	 */
 	_scrollTo(left: number) {
 		const { scrollerBody } = this;
 		if ('scrollBehavior' in document.documentElement.style) {
@@ -310,7 +366,10 @@ export class UTable implements IUTable {
 		}
 	}
 
-	// Sync cell widths
+	/**
+	 * Set equal width to cells
+	 * @private
+	 */
 	_setEqualWidth() {
 		if (!this.tableHead || !this.shadowTable) return;
 
@@ -325,10 +384,10 @@ export class UTable implements IUTable {
 		const td: HTMLTableCellElement[] = Array.from(
 			this.tableBody.querySelectorAll('tr:first-child > *')
 		);
-		const thShadow = Array.from(
+		const _th = Array.from(
 			this.shadowTable.querySelectorAll('thead > tr > *')
 		).map((el) => el.getBoundingClientRect().width);
-		const tdShadow = Array.from(
+		const _td = Array.from(
 			this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')
 		).map((el) => el.getBoundingClientRect().width);
 
@@ -336,11 +395,16 @@ export class UTable implements IUTable {
 		this.el.removeChild(this.shadowTable);
 
 		// Set width
-		[...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
-		[...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
+		th.forEach((el, index) => this._setWidth(el, _th[index]));
+		td.forEach((el, index) => this._setWidth(el, _td[index]));
 	}
 
-	// Set width to elements
+	/**
+	 * Set width to elements
+	 * @param {HTMLElement | HTMLElement[]} el - Element or elements
+	 * @param {number | string} width - Width value
+	 * @private
+	 */
 	_setWidth(el: HTMLElement | HTMLElement[], width?: number | string) {
 		(Array.isArray(el) ? el : [el]).forEach((el) => {
 			el.style.width = width ? `${width}px` : '';
@@ -348,34 +412,61 @@ export class UTable implements IUTable {
 		});
 	}
 
-	_toggleButton(el: HTMLButtonElement, isScroll: boolean) {
-		el.disabled = !isScroll;
+	/**
+	 * Toggle button visibility
+	 * @param {HTMLButtonElement} el - Button element
+	 * @param {boolean} isActive - Is active
+	 */
+	_toggleButton(el: HTMLButtonElement, isActive: boolean) {
+		el.disabled = !isActive;
 		el.style.display = this.isScrollable ? '' : 'none';
 	}
 
-	_toggleScroll(el: HTMLElement, isScroll: boolean) {
-		el.style.opacity = !isScroll ? '0' : '1';
+	/**
+	 * Toggle overlay visibility
+	 * @param {HTMLElement} el - Overlay element
+	 * @param {boolean} isActive - Is active
+	 * @private
+	 */
+	_toggleOverlay(el: HTMLElement, isActive: boolean) {
+		el.style.opacity = !isActive ? '0' : '1';
 		// Don't overlay scrollbar
 		if (el.parentElement === this.trackBody)
 			el.style.height = `${this.tableBodyHeight}px`;
 	}
 
+	/**
+	 * Button left click event
+	 * @private
+	 */
 	_onClickButtonLeft() {
 		const { clientWidth, scrollLeft } = this.scrollerBody;
 		this._scrollTo(scrollLeft - clientWidth * 0.75);
 		this._isScrollable();
 	}
 
+	/**
+	 * Button right click event
+	 * @private
+	 */
 	_onClickButtonRight() {
 		const { clientWidth, scrollLeft } = this.scrollerBody;
 		this._scrollTo(scrollLeft + clientWidth * 0.75);
 		this._isScrollable();
 	}
 
+	/**
+	 * Resize event
+	 * @private
+	 */
 	_onResize() {
 		this.update();
 	}
 
+	/**
+	 * Scroll event
+	 * @private
+	 */
 	_onScroll() {
 		this._isScrollable();
 	}

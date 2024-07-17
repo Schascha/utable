@@ -27,6 +27,7 @@
             this.options = Object.assign(Object.assign({}, UTableDefaults), options);
             this._ = {};
             this.isScrollable = false;
+            // Check if table exists
             if (!this.table || !(this.table instanceof HTMLTableElement)) {
                 throw new Error('Element not found');
             }
@@ -102,11 +103,14 @@
         }
         get tableHead() {
             var _a;
-            if (!this._.tableHead) {
+            if (typeof this._.tableHead === 'undefined') {
                 const thead = (_a = this.el) === null || _a === void 0 ? void 0 : _a.querySelector('thead');
                 if (thead) {
                     this._.tableHead = document.createElement('table');
                     this._.tableHead.appendChild(thead);
+                }
+                else {
+                    this._.tableHead = thead;
                 }
             }
             return this._.tableHead;
@@ -135,11 +139,12 @@
                     className: `${this.options.classTrack} thead`,
                 });
                 this._.trackHead.appendChild(this.scrollerHead);
+                this.el.appendChild(this._.trackHead);
             }
             return this._.trackHead;
         }
         destroy() {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j;
             // Unbind events
             window.removeEventListener('resize', this._onResize);
             window.removeEventListener('orientationchange', this._onResize);
@@ -148,31 +153,50 @@
             (_c = this.buttonRight) === null || _c === void 0 ? void 0 : _c.removeEventListener('click', this._onClickButtonRight);
             (_d = this.observer) === null || _d === void 0 ? void 0 : _d.disconnect();
             // Restore table
-            this.tableHead && this.table.prepend(this.tableHead.firstChild);
-            (_f = (_e = this.el) === null || _e === void 0 ? void 0 : _e.parentNode) === null || _f === void 0 ? void 0 : _f.replaceChild(this.table, this.el);
-            (_h = (_g = this.top) === null || _g === void 0 ? void 0 : _g.parentNode) === null || _h === void 0 ? void 0 : _h.removeChild(this.top);
+            ((_e = this.tableHead) === null || _e === void 0 ? void 0 : _e.firstChild) && this.table.prepend(this.tableHead.firstChild);
+            (_g = (_f = this.el) === null || _f === void 0 ? void 0 : _f.parentNode) === null || _g === void 0 ? void 0 : _g.replaceChild(this.table, this.el);
+            (_j = (_h = this.top) === null || _h === void 0 ? void 0 : _h.parentNode) === null || _j === void 0 ? void 0 : _j.removeChild(this.top);
             // Remove private properties
             this._ = {};
         }
+        /**
+         * Render method
+         * This method should be called to initialize the table
+         * @returns {this} - Table instance
+         */
         render() {
             // Create shadow table
             this._createShadowTable();
-            // Split table into head and body
-            if (this.trackHead) {
-                this.el.appendChild(this.trackHead);
-                this._isSticky();
-            }
+            // Append elements
+            this._isSticky();
             this.el.appendChild(this.trackBody);
             // Resize event
             window.addEventListener('resize', this._onResize);
             window.addEventListener('orientationchange', this._onResize);
-            this.update();
-            return this;
+            return this.update();
         }
+        /**
+         * Update method
+         * This method should be called when the table is updated
+         * @returns {this} - Table instance
+         */
         update() {
+            // Fall back to render method
+            if (!Object.keys(this._).length) {
+                return this.render();
+            }
             this._setEqualWidth();
             this._isScrollable();
+            return this;
         }
+        /**
+         * Create button
+         * @param {string} className - Button class name
+         * @param {string} text - Button text
+         * @param {string} title - Button title
+         * @param {() => void} event - Button click event
+         * @returns {HTMLButtonElement} - Button element
+         */
         _createButton(className, text, title, event) {
             const button = this._createElement('button', {
                 className,
@@ -185,6 +209,16 @@
             button.addEventListener('click', event);
             return button;
         }
+        /**
+         * Create element
+         * @param {K} tag
+         * @param {Object} options - Element options
+         * @param {string} options.className - Element class name
+         * @param {string} options.insertMethod - Insert method, default is append
+         * @param {Element} options.parent - Parent element
+         * @private
+         * @returns {HTMLElementTagNameMap[K]} - Element
+         */
         _createElement(tag, options = {}) {
             const el = document.createElement(tag);
             const { className, insertMethod, parent } = options;
@@ -194,18 +228,33 @@
                 parent[insertMethod || 'append'](el);
             return el;
         }
+        /**
+         * Create overlay
+         * @param {string} className - Overlay class name
+         * @private
+         * @returns {HTMLDivElement[]} - Overlay elements
+         */
         _createOverlay(className) {
             const { _createElement: $, trackBody, trackHead } = this;
             const el = [$('div', { className, parent: trackBody })];
             trackHead && el.push($('div', { className, parent: trackHead }));
             return el;
         }
+        /**
+         * Create shadow table
+         * This table is a copy of the original table and is used to calculate the width of the cells
+         * @private
+         */
         _createShadowTable() {
             this.shadowTable = this.table.cloneNode(true);
             this.shadowTable.style.visibility = 'hidden';
             this.shadowTable.style.position = 'absolute';
             this.shadowTable.style.zIndex = '-2147483640';
         }
+        /**
+         * Check if table is scrollable
+         * @private
+         */
         _isScrollable() {
             const { clientWidth, scrollLeft, scrollWidth } = this.scrollerBody;
             const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
@@ -213,8 +262,8 @@
             this.isScrollable = isScrollLeft || isScrollRight;
             // Toggle overlays
             if (this.options.overlays) {
-                this.overlayLeft.forEach((el) => this._toggleScroll(el, isScrollLeft));
-                this.overlayRight.forEach((el) => this._toggleScroll(el, isScrollRight));
+                this.overlayLeft.forEach((el) => this._toggleOverlay(el, isScrollLeft));
+                this.overlayRight.forEach((el) => this._toggleOverlay(el, isScrollRight));
             }
             // Toggle buttons
             if (this.options.buttons) {
@@ -225,8 +274,12 @@
             if (this.scrollerHead)
                 this.scrollerHead.scrollLeft = scrollLeft;
         }
+        /**
+         * Sticky header
+         * @private
+         */
         _isSticky() {
-            if (!window.IntersectionObserver || !this.top)
+            if (!window.IntersectionObserver || !this.top || !this.trackHead)
                 return;
             // Detect when headers gets sticky
             this.observer = new window.IntersectionObserver(([e]) => {
@@ -236,6 +289,11 @@
             // Observe top element
             this.observer.observe(this.top);
         }
+        /**
+         * Scroll to position
+         * @param {number} left - Scroll left position
+         * @private
+         */
         _scrollTo(left) {
             const { scrollerBody } = this;
             if ('scrollBehavior' in document.documentElement.style) {
@@ -248,7 +306,10 @@
                 scrollerBody.scrollLeft = left;
             }
         }
-        // Sync cell widths
+        /**
+         * Set equal width to cells
+         * @private
+         */
         _setEqualWidth() {
             if (!this.tableHead || !this.shadowTable)
                 return;
@@ -258,44 +319,76 @@
             // Get elements
             const th = Array.from(this.tableHead.querySelectorAll('tr > *'));
             const td = Array.from(this.tableBody.querySelectorAll('tr:first-child > *'));
-            const thShadow = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
-            const tdShadow = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
+            const _th = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
+            const _td = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
             // Remove shadow table
             this.el.removeChild(this.shadowTable);
             // Set width
-            [...th].forEach((el, index) => this._setWidth(el, thShadow[index]));
-            [...td].forEach((el, index) => this._setWidth(el, tdShadow[index]));
+            th.forEach((el, index) => this._setWidth(el, _th[index]));
+            td.forEach((el, index) => this._setWidth(el, _td[index]));
         }
-        // Set width to elements
+        /**
+         * Set width to elements
+         * @param {HTMLElement | HTMLElement[]} el - Element or elements
+         * @param {number | string} width - Width value
+         * @private
+         */
         _setWidth(el, width) {
             (Array.isArray(el) ? el : [el]).forEach((el) => {
                 el.style.width = width ? `${width}px` : '';
                 el.style.minWidth = width ? `${width}px` : '';
             });
         }
-        _toggleButton(el, isScroll) {
-            el.disabled = !isScroll;
+        /**
+         * Toggle button visibility
+         * @param {HTMLButtonElement} el - Button element
+         * @param {boolean} isActive - Is active
+         */
+        _toggleButton(el, isActive) {
+            el.disabled = !isActive;
             el.style.display = this.isScrollable ? '' : 'none';
         }
-        _toggleScroll(el, isScroll) {
-            el.style.opacity = !isScroll ? '0' : '1';
+        /**
+         * Toggle overlay visibility
+         * @param {HTMLElement} el - Overlay element
+         * @param {boolean} isActive - Is active
+         * @private
+         */
+        _toggleOverlay(el, isActive) {
+            el.style.opacity = !isActive ? '0' : '1';
             // Don't overlay scrollbar
             if (el.parentElement === this.trackBody)
                 el.style.height = `${this.tableBodyHeight}px`;
         }
+        /**
+         * Button left click event
+         * @private
+         */
         _onClickButtonLeft() {
             const { clientWidth, scrollLeft } = this.scrollerBody;
             this._scrollTo(scrollLeft - clientWidth * 0.75);
             this._isScrollable();
         }
+        /**
+         * Button right click event
+         * @private
+         */
         _onClickButtonRight() {
             const { clientWidth, scrollLeft } = this.scrollerBody;
             this._scrollTo(scrollLeft + clientWidth * 0.75);
             this._isScrollable();
         }
+        /**
+         * Resize event
+         * @private
+         */
         _onResize() {
             this.update();
         }
+        /**
+         * Scroll event
+         * @private
+         */
         _onScroll() {
             this._isScrollable();
         }
