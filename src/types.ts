@@ -17,4 +17,6 @@ export interface IUTableOptions {
 	classWrapper: string;
 	textButtonLeft: string;
 	textButtonRight: string;
+	titleButtonLeft: string;
+	titleButtonRight: string;
 }

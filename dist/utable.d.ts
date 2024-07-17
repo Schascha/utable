@@ -34,7 +34,7 @@ export declare class UTable implements IUTable {
     destroy(): void;
     render(): this;
     update(): void;
-    _createButton(className: string, text: string): HTMLButtonElement;
+    _createButton(className: string, text: string, title: string, event: () => void): HTMLButtonElement;
     _createElement<K extends keyof HTMLElementTagNameMap>(tag: K, options?: {
         className?: string;
         insertMethod?: 'prepend' | 'append' | 'before' | 'after';

@@ -17,6 +17,8 @@
         classWrapper: 'utable',
         textButtonLeft: 'Left',
         textButtonRight: 'Right',
+        titleButtonLeft: 'Scroll left',
+        titleButtonRight: 'Scroll right',
     };
 
     class UTable {
@@ -24,6 +26,7 @@
             this.table = (typeof table === 'string' ? document.querySelector(table) : table);
             this.options = Object.assign(Object.assign({}, UTableDefaults), options);
             this.isScrollable = false;
+            console.log('UTable', this.table, this.options);
             if (!this.table || !(this.table instanceof HTMLTableElement)) {
                 throw new Error('Element not found');
             }
@@ -47,17 +50,15 @@
         }
         get buttonLeft() {
             if (!this._buttonLeft) {
-                const { classButtonLeft, textButtonLeft } = this.options;
-                this._buttonLeft = this._createButton(classButtonLeft, textButtonLeft);
-                this._buttonLeft.addEventListener('click', this._onClickButtonLeft);
+                const { classButtonLeft, textButtonLeft, titleButtonLeft } = this.options;
+                this._buttonLeft = this._createButton(classButtonLeft, textButtonLeft, titleButtonLeft, this._onClickButtonLeft);
             }
             return this._buttonLeft;
         }
         get buttonRight() {
             if (!this._buttonRight) {
-                const { classButtonRight, textButtonRight } = this.options;
-                this._buttonRight = this._createButton(classButtonRight, textButtonRight);
-                this._buttonRight.addEventListener('click', this._onClickButtonRight);
+                const { classButtonRight, textButtonRight, titleButtonRight } = this.options;
+                this._buttonRight = this._createButton(classButtonRight, textButtonRight, titleButtonRight, this._onClickButtonRight);
             }
             return this._buttonRight;
         }
@@ -183,14 +184,16 @@
             this._setEqualWidth();
             this._isScrollable();
         }
-        _createButton(className, text) {
+        _createButton(className, text, title, event) {
             const button = this._createElement('button', {
                 className,
                 parent: this.trackHead,
                 insertMethod: 'prepend',
             });
             button.type = 'button';
+            button.title = title;
             button.innerHTML = `<span>${text}</span>`;
+            button.addEventListener('click', event);
             return button;
         }
         _createElement(tag, options = {}) {

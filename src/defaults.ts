@@ -13,4 +13,6 @@ export const UTableDefaults: IUTableOptions = {
 	classWrapper: 'utable',
 	textButtonLeft: 'Left',
 	textButtonRight: 'Right',
+	titleButtonLeft: 'Scroll left',
+	titleButtonRight: 'Scroll right',
 };

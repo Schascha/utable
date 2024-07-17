@@ -11,4 +11,6 @@ export const UTableDefaults = {
     classWrapper: 'utable',
     textButtonLeft: 'Left',
     textButtonRight: 'Right',
+    titleButtonLeft: 'Scroll left',
+    titleButtonRight: 'Scroll right',
 };
