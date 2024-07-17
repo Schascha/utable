@@ -1,22 +1,11 @@
 import { IUTable, IUTableOptions } from './types';
 export declare class UTable implements IUTable {
     isScrollable: boolean;
-    observer: IntersectionObserver | undefined;
+    observer?: IntersectionObserver;
     options: IUTableOptions;
-    shadowTable: HTMLTableElement | undefined;
+    shadowTable?: HTMLTableElement;
     table: HTMLTableElement;
-    private _buttonLeft;
-    private _buttonRight;
-    private _el;
-    private _scrollerBody;
-    private _scrollerHead;
-    private _overlayLeft;
-    private _overlayRight;
-    private _tableBody;
-    private _tableHead;
-    private _top;
-    private _trackBody;
-    private _trackHead;
+    private _;
     constructor(table: HTMLTableElement | string, options?: Partial<IUTableOptions>);
     get el(): HTMLDivElement;
     get buttonLeft(): HTMLButtonElement;

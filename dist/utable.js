@@ -3,8 +3,8 @@ export class UTable {
     constructor(table, options) {
         this.table = (typeof table === 'string' ? document.querySelector(table) : table);
         this.options = Object.assign(Object.assign({}, UTableDefaults), options);
+        this._ = {};
         this.isScrollable = false;
-        console.log('UTable', this.table, this.options);
         if (!this.table || !(this.table instanceof HTMLTableElement)) {
             throw new Error('Element not found');
         }
@@ -16,62 +16,63 @@ export class UTable {
         this.render();
     }
     get el() {
-        if (!this._el) {
-            this._el = this._createElement('div', {
+        if (!this._.el) {
+            this._.el = this._createElement('div', {
                 className: this.options.classWrapper,
                 insertMethod: 'before',
                 parent: this.table,
             });
-            this._el.appendChild(this.table);
+            this._.el.appendChild(this.table);
         }
-        return this._el;
+        return this._.el;
     }
     get buttonLeft() {
-        if (!this._buttonLeft) {
+        if (!this._.buttonLeft) {
             const { classButtonLeft, textButtonLeft, titleButtonLeft } = this.options;
-            this._buttonLeft = this._createButton(classButtonLeft, textButtonLeft, titleButtonLeft, this._onClickButtonLeft);
+            this._.buttonLeft = this._createButton(classButtonLeft, textButtonLeft, titleButtonLeft, this._onClickButtonLeft);
         }
-        return this._buttonLeft;
+        return this._.buttonLeft;
     }
     get buttonRight() {
-        if (!this._buttonRight) {
+        if (!this._.buttonRight) {
             const { classButtonRight, textButtonRight, titleButtonRight } = this.options;
-            this._buttonRight = this._createButton(classButtonRight, textButtonRight, titleButtonRight, this._onClickButtonRight);
+            this._.buttonRight = this._createButton(classButtonRight, textButtonRight, titleButtonRight, this._onClickButtonRight);
         }
-        return this._buttonRight;
+        return this._.buttonRight;
     }
     get scrollerHead() {
-        if (!this._scrollerHead && this.tableHead) {
-            this._scrollerHead = this._createElement('div', {
+        if (!this._.scrollerHead && this.tableHead) {
+            this._.scrollerHead = this._createElement('div', {
                 className: this.options.classScroller,
             });
-            this._scrollerHead.appendChild(this.tableHead);
+            this._.scrollerHead.appendChild(this.tableHead);
         }
-        return this._scrollerHead;
+        return this._.scrollerHead;
     }
     get scrollerBody() {
-        if (!this._scrollerBody) {
-            this._scrollerBody = this._createElement('div', {
+        if (!this._.scrollerBody) {
+            this._.scrollerBody = this._createElement('div', {
                 className: this.options.classScroller,
             });
-            this._scrollerBody.appendChild(this.tableBody);
-            this._scrollerBody.addEventListener('scroll', this._onScroll);
+            this._.scrollerBody.appendChild(this.tableBody);
+            this._.scrollerBody.addEventListener('scroll', this._onScroll);
         }
-        return this._scrollerBody;
+        return this._.scrollerBody;
     }
     get overlayLeft() {
-        this._overlayLeft =
-            this._overlayLeft || this._createOverlay(this.options.classOverlayLeft);
-        return this._overlayLeft;
+        this._.overlayLeft =
+            this._.overlayLeft || this._createOverlay(this.options.classOverlayLeft);
+        return this._.overlayLeft;
     }
     get overlayRight() {
-        this._overlayRight =
-            this._overlayRight || this._createOverlay(this.options.classOverlayRight);
-        return this._overlayRight;
+        this._.overlayRight =
+            this._.overlayRight ||
+                this._createOverlay(this.options.classOverlayRight);
+        return this._.overlayRight;
     }
     get tableBody() {
-        this._tableBody = this._tableBody || this.table;
-        return this._tableBody;
+        this._.tableBody = this._.tableBody || this.table;
+        return this._.tableBody;
     }
     get tableBodyHeight() {
         var _a;
@@ -79,41 +80,41 @@ export class UTable {
     }
     get tableHead() {
         var _a;
-        if (!this._tableHead) {
+        if (!this._.tableHead) {
             const thead = (_a = this.el) === null || _a === void 0 ? void 0 : _a.querySelector('thead');
             if (thead) {
-                this._tableHead = document.createElement('table');
-                this._tableHead.appendChild(thead);
+                this._.tableHead = document.createElement('table');
+                this._.tableHead.appendChild(thead);
             }
         }
-        return this._tableHead;
+        return this._.tableHead;
     }
     get top() {
-        if (!this._top) {
-            this._top = this._createElement('div', {
+        if (!this._.top) {
+            this._.top = this._createElement('div', {
                 parent: this.el,
                 insertMethod: 'prepend',
             });
         }
-        return this._top;
+        return this._.top;
     }
     get trackBody() {
-        if (!this._trackBody) {
-            this._trackBody = this._createElement('div', {
+        if (!this._.trackBody) {
+            this._.trackBody = this._createElement('div', {
                 className: `${this.options.classTrack} tbody`,
             });
-            this._trackBody.appendChild(this.scrollerBody);
+            this._.trackBody.appendChild(this.scrollerBody);
         }
-        return this._trackBody;
+        return this._.trackBody;
     }
     get trackHead() {
-        if (!this._trackHead && this.scrollerHead) {
-            this._trackHead = this._createElement('div', {
+        if (!this._.trackHead && this.scrollerHead) {
+            this._.trackHead = this._createElement('div', {
                 className: `${this.options.classTrack} thead`,
             });
-            this._trackHead.appendChild(this.scrollerHead);
+            this._.trackHead.appendChild(this.scrollerHead);
         }
-        return this._trackHead;
+        return this._.trackHead;
     }
     destroy() {
         var _a, _b, _c, _d, _e, _f, _g, _h;
@@ -129,19 +130,7 @@ export class UTable {
         (_f = (_e = this.el) === null || _e === void 0 ? void 0 : _e.parentNode) === null || _f === void 0 ? void 0 : _f.replaceChild(this.table, this.el);
         (_h = (_g = this.top) === null || _g === void 0 ? void 0 : _g.parentNode) === null || _h === void 0 ? void 0 : _h.removeChild(this.top);
         // Remove private properties
-        this._el =
-            this._scrollerBody =
-                this._scrollerHead =
-                    this._tableBody =
-                        this._tableHead =
-                            this._top =
-                                this._trackBody =
-                                    this._trackHead =
-                                        this._buttonLeft =
-                                            this._buttonRight =
-                                                this._overlayLeft =
-                                                    this._overlayRight =
-                                                        undefined;
+        this._ = {};
     }
     render() {
         // Create shadow table
