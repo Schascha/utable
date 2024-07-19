@@ -303,7 +303,9 @@ export class UTable {
             return;
         // Append shadow table
         this.el.prepend(this.shadowTable);
-        this.shadowTable.style.width = `${this.el.clientWidth}px`;
+        const { marginLeft, marginRight } = window.getComputedStyle(this.table);
+        const offset = (parseInt(marginLeft, 10) || 0) + (parseInt(marginRight, 10) || 0); // Remove table margin from width
+        this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
         // Get cell widths
         const _th = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
         const _td = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
