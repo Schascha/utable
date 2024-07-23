@@ -1,6 +1,6 @@
 {
   "name": "@schascha/utable",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "src/index.ts",
   "scripts": {
     "build": "run-s tsc rollup",
