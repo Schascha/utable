@@ -82,6 +82,7 @@
                 el.appendChild(this.tableBody);
                 el.addEventListener('scroll', this._onScroll);
                 onScrollend && el.addEventListener('scrollend', this._onScrollend);
+                el.setAttribute('tabindex', '0');
                 this._.scrollerBody = el;
             }
             return this._.scrollerBody;
@@ -98,10 +99,7 @@
             return this._.overlayRight;
         }
         get tableBody() {
-            if (!this._.tableBody) {
-                this._.tableBody = this._.tableBody || this.table;
-                this._.tableBody.setAttribute('tabindex', '0');
-            }
+            this._.tableBody = this._.tableBody || this.table;
             return this._.tableBody;
         }
         get tableBodyHeight() {

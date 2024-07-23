@@ -105,6 +105,7 @@ export class UTable implements IUTable {
 			el.appendChild(this.tableBody);
 			el.addEventListener('scroll', this._onScroll);
 			onScrollend && el.addEventListener('scrollend', this._onScrollend);
+			el.setAttribute('tabindex', '0');
 			this._.scrollerBody = el;
 		}
 		return this._.scrollerBody;
@@ -124,10 +125,7 @@ export class UTable implements IUTable {
 	}
 
 	get tableBody(): HTMLTableElement {
-		if (!this._.tableBody) {
-			this._.tableBody = this._.tableBody || this.table;
-			this._.tableBody.setAttribute('tabindex', '0');
-		}
+		this._.tableBody = this._.tableBody || this.table;
 		return this._.tableBody;
 	}
 
