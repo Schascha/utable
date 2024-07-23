@@ -72,7 +72,10 @@ export class UTable {
         return this._.overlayRight;
     }
     get tableBody() {
-        this._.tableBody = this._.tableBody || this.table;
+        if (!this._.tableBody) {
+            this._.tableBody = this._.tableBody || this.table;
+            this._.tableBody.setAttribute('tabindex', '0');
+        }
         return this._.tableBody;
     }
     get tableBodyHeight() {
