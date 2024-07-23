@@ -214,6 +214,16 @@ export class UTable implements IUTable {
 	 * @returns {this} - Table instance
 	 */
 	render(): this {
+		// Update options from data attribute
+		const { options } = this.table.dataset;
+		try {
+			const json = options ? JSON.parse(options) : {};
+			this.options = {
+				...this.options,
+				...json,
+			};
+		} catch {}
+
 		// Create shadow table
 		this._createShadowTable();
 

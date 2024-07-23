@@ -157,6 +157,13 @@ export class UTable {
      * @returns {this} - Table instance
      */
     render() {
+        // Update options from data attribute
+        const { options } = this.table.dataset;
+        try {
+            const json = options ? JSON.parse(options) : {};
+            this.options = Object.assign(Object.assign({}, this.options), json);
+        }
+        catch (_a) { }
         // Create shadow table
         this._createShadowTable();
         // Append elements
