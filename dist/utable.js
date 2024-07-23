@@ -12,6 +12,7 @@ export class UTable {
         // Bind events
         this._onResize = this._onResize.bind(this);
         this._onScroll = this._onScroll.bind(this);
+        this._onScrollend = this._onScrollend.bind(this);
         this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
         this._onClickButtonRight = this._onClickButtonRight.bind(this);
         this.render();
@@ -52,11 +53,12 @@ export class UTable {
     }
     get scrollerBody() {
         if (!this._.scrollerBody) {
-            this._.scrollerBody = this._createElement('div', {
-                className: this.options.classScroller,
-            });
-            this._.scrollerBody.appendChild(this.tableBody);
-            this._.scrollerBody.addEventListener('scroll', this._onScroll);
+            const { classScroller, onScrollend } = this.options;
+            const el = this._createElement('div', { className: classScroller });
+            el.appendChild(this.tableBody);
+            el.addEventListener('scroll', this._onScroll);
+            onScrollend && el.addEventListener('scrollend', this._onScrollend);
+            this._.scrollerBody = el;
         }
         return this._.scrollerBody;
     }
@@ -134,20 +136,21 @@ export class UTable {
         return this._.trackHead;
     }
     destroy() {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         // Unbind events
         window.removeEventListener('resize', this._onResize);
         window.removeEventListener('orientationchange', this._onResize);
         (_a = this.scrollerBody) === null || _a === void 0 ? void 0 : _a.removeEventListener('scroll', this._onScroll);
-        (_b = this.buttonLeft) === null || _b === void 0 ? void 0 : _b.removeEventListener('click', this._onClickButtonLeft);
-        (_c = this.buttonRight) === null || _c === void 0 ? void 0 : _c.removeEventListener('click', this._onClickButtonRight);
-        (_d = this.observer) === null || _d === void 0 ? void 0 : _d.disconnect();
+        (_b = this.scrollerBody) === null || _b === void 0 ? void 0 : _b.removeEventListener('scrollend', this._onScrollend);
+        (_c = this.buttonLeft) === null || _c === void 0 ? void 0 : _c.removeEventListener('click', this._onClickButtonLeft);
+        (_d = this.buttonRight) === null || _d === void 0 ? void 0 : _d.removeEventListener('click', this._onClickButtonRight);
+        (_e = this.observer) === null || _e === void 0 ? void 0 : _e.disconnect();
         // Restore table
         this.th.forEach((el) => this._setWidth(el));
         this.td.forEach((el) => this._setWidth(el));
-        ((_e = this.tableHead) === null || _e === void 0 ? void 0 : _e.firstChild) && this.table.prepend(this.tableHead.firstChild);
-        (_g = (_f = this.el) === null || _f === void 0 ? void 0 : _f.parentNode) === null || _g === void 0 ? void 0 : _g.replaceChild(this.table, this.el);
-        (_j = (_h = this.top) === null || _h === void 0 ? void 0 : _h.parentNode) === null || _j === void 0 ? void 0 : _j.removeChild(this.top);
+        ((_f = this.tableHead) === null || _f === void 0 ? void 0 : _f.firstChild) && this.table.prepend(this.tableHead.firstChild);
+        (_h = (_g = this.el) === null || _g === void 0 ? void 0 : _g.parentNode) === null || _h === void 0 ? void 0 : _h.replaceChild(this.table, this.el);
+        (_k = (_j = this.top) === null || _j === void 0 ? void 0 : _j.parentNode) === null || _k === void 0 ? void 0 : _k.removeChild(this.top);
         // Remove private properties
         this._ = {};
     }
@@ -362,19 +365,23 @@ export class UTable {
      * Button left click event
      * @private
      */
-    _onClickButtonLeft() {
+    _onClickButtonLeft(e) {
+        const { onClickButtonLeft } = this.options;
         const { clientWidth, scrollLeft } = this.scrollerBody;
         this._scrollTo(scrollLeft - clientWidth * 0.75);
         this._isScrollable();
+        typeof onClickButtonLeft === 'function' && onClickButtonLeft(e);
     }
     /**
      * Button right click event
      * @private
      */
-    _onClickButtonRight() {
+    _onClickButtonRight(e) {
+        const { onClickButtonRight } = this.options;
         const { clientWidth, scrollLeft } = this.scrollerBody;
         this._scrollTo(scrollLeft + clientWidth * 0.75);
         this._isScrollable();
+        typeof onClickButtonRight === 'function' && onClickButtonRight(e);
     }
     /**
      * Resize event
@@ -387,7 +394,13 @@ export class UTable {
      * Scroll event
      * @private
      */
-    _onScroll() {
+    _onScroll(e) {
+        const { onScroll } = this.options;
         this._isScrollable();
+        typeof onScroll === 'function' && onScroll(e);
+    }
+    _onScrollend(e) {
+        const { onScrollend } = this.options;
+        typeof onScrollend === 'function' && onScrollend(e);
     }
 }

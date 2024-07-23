@@ -43,7 +43,7 @@ export declare class UTable implements IUTable {
      * @param {() => void} event - Button click event
      * @returns {HTMLButtonElement} - Button element
      */
-    _createButton(className: string, text: string, title: string, event: () => void): HTMLButtonElement;
+    _createButton(className: string, text: string, title: string, event: (e: Event) => void): HTMLButtonElement;
     /**
      * Create element
      * @param {K} tag
@@ -117,12 +117,12 @@ export declare class UTable implements IUTable {
      * Button left click event
      * @private
      */
-    _onClickButtonLeft(): void;
+    _onClickButtonLeft(e: Event): void;
     /**
      * Button right click event
      * @private
      */
-    _onClickButtonRight(): void;
+    _onClickButtonRight(e: Event): void;
     /**
      * Resize event
      * @private
@@ -132,5 +132,6 @@ export declare class UTable implements IUTable {
      * Scroll event
      * @private
      */
-    _onScroll(): void;
+    _onScroll(e: Event): void;
+    _onScrollend(e: Event): void;
 }

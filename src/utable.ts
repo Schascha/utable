@@ -42,6 +42,7 @@ export class UTable implements IUTable {
 		// Bind events
 		this._onResize = this._onResize.bind(this);
 		this._onScroll = this._onScroll.bind(this);
+		this._onScrollend = this._onScrollend.bind(this);
 		this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
 		this._onClickButtonRight = this._onClickButtonRight.bind(this);
 
@@ -99,11 +100,12 @@ export class UTable implements IUTable {
 
 	get scrollerBody(): HTMLDivElement {
 		if (!this._.scrollerBody) {
-			this._.scrollerBody = this._createElement('div', {
-				className: this.options.classScroller,
-			});
-			this._.scrollerBody.appendChild(this.tableBody);
-			this._.scrollerBody.addEventListener('scroll', this._onScroll);
+			const { classScroller, onScrollend } = this.options;
+			const el = this._createElement('div', { className: classScroller });
+			el.appendChild(this.tableBody);
+			el.addEventListener('scroll', this._onScroll);
+			onScrollend && el.addEventListener('scrollend', this._onScrollend);
+			this._.scrollerBody = el;
 		}
 		return this._.scrollerBody;
 	}
@@ -193,6 +195,7 @@ export class UTable implements IUTable {
 		window.removeEventListener('resize', this._onResize);
 		window.removeEventListener('orientationchange', this._onResize);
 		this.scrollerBody?.removeEventListener('scroll', this._onScroll);
+		this.scrollerBody?.removeEventListener('scrollend', this._onScrollend);
 		this.buttonLeft?.removeEventListener('click', this._onClickButtonLeft);
 		this.buttonRight?.removeEventListener('click', this._onClickButtonRight);
 		this.observer?.disconnect();
@@ -264,7 +267,7 @@ export class UTable implements IUTable {
 		className: string,
 		text: string,
 		title: string,
-		event: () => void
+		event: (e: Event) => void
 	): HTMLButtonElement {
 		const button = this._createElement('button', {
 			className,
@@ -462,20 +465,24 @@ export class UTable implements IUTable {
 	 * Button left click event
 	 * @private
 	 */
-	_onClickButtonLeft() {
+	_onClickButtonLeft(e: Event) {
+		const { onClickButtonLeft } = this.options;
 		const { clientWidth, scrollLeft } = this.scrollerBody;
 		this._scrollTo(scrollLeft - clientWidth * 0.75);
 		this._isScrollable();
+		typeof onClickButtonLeft === 'function' && onClickButtonLeft(e);
 	}
 
 	/**
 	 * Button right click event
 	 * @private
 	 */
-	_onClickButtonRight() {
+	_onClickButtonRight(e: Event) {
+		const { onClickButtonRight } = this.options;
 		const { clientWidth, scrollLeft } = this.scrollerBody;
 		this._scrollTo(scrollLeft + clientWidth * 0.75);
 		this._isScrollable();
+		typeof onClickButtonRight === 'function' && onClickButtonRight(e);
 	}
 
 	/**
@@ -490,7 +497,14 @@ export class UTable implements IUTable {
 	 * Scroll event
 	 * @private
 	 */
-	_onScroll() {
+	_onScroll(e: Event) {
+		const { onScroll } = this.options;
 		this._isScrollable();
+		typeof onScroll === 'function' && onScroll(e);
+	}
+
+	_onScrollend(e: Event) {
+		const { onScrollend } = this.options;
+		typeof onScrollend === 'function' && onScrollend(e);
 	}
 }

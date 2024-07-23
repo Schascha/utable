@@ -327,7 +327,17 @@
 		const uTable = window.UTable.UTable; // Module is namespaced in UMD build
 		const tables = Array.from(document.querySelectorAll('table')).map((el) => ({
 			el,
-			table: new uTable(el),
+			table: new uTable(el, {
+				onClickButtonLeft: (e) => {
+					console.log('Left button clicked', e);
+				},
+				onClickButtonRight: (e) => {
+					console.log('Right button clicked', e);
+				},
+				onScrollend: (e) => {
+					console.log('Scrolled', e);
+				},
+			}),
 		}));
 	</script>
 </html>
