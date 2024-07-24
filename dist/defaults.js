@@ -2,6 +2,7 @@ export const UTableDefaults = {
     buttons: true,
     overlays: true,
     sticky: true,
+    width: 'auto',
     classButtonLeft: 'button-left',
     classButtonRight: 'button-right',
     classOverlayLeft: 'scroll-left',

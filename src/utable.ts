@@ -88,6 +88,13 @@ export class UTable implements IUTable {
 		return this._.buttonRight;
 	}
 
+	get columnCount(): number {
+		return Array.from(this.table.querySelector('tr')?.children || []).reduce(
+			(acc, el) => acc + ((el as HTMLTableCellElement).colSpan || 1),
+			0
+		);
+	}
+
 	get scrollerHead(): HTMLDivElement | undefined {
 		if (!this._.scrollerHead && this.tableHead) {
 			this._.scrollerHead = this._createElement('div', {
@@ -398,29 +405,43 @@ export class UTable implements IUTable {
 	 * @private
 	 */
 	_setEqualWidth() {
-		if (!this.tableHead || !this.shadowTable) return;
+		if (!this.shadowTable) return;
 
-		// Append shadow table
+		// Append shadow table and calculate table width
 		this.el.prepend(this.shadowTable);
 		const { marginLeft, marginRight } = window.getComputedStyle(this.table);
 		const offset =
 			(parseInt(marginLeft, 10) || 0) + (parseInt(marginRight, 10) || 0); // Remove table margin from width
-		this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
-
-		// Get cell widths
 		const _th = Array.from(
 			this.shadowTable.querySelectorAll('thead > tr > *')
-		).map((el) => el.getBoundingClientRect().width);
+		) as HTMLTableCellElement[];
 		const _td = Array.from(
 			this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')
-		).map((el) => el.getBoundingClientRect().width);
+		) as HTMLTableCellElement[];
+		if (this.options.width === 'auto') {
+			this.shadowTable.style.tableLayout = 'auto';
+			this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
+		} else {
+			const max = [..._th, ..._td]
+				.filter((el) => el.colSpan === 1)
+				.reduce((acc, el) => {
+					const width = el.getBoundingClientRect().width;
+					return width > acc ? width : acc;
+				}, 0);
+			this.shadowTable.style.tableLayout = 'fixed';
+			this.shadowTable.style.width = `${max * this.columnCount}px`;
+		}
+
+		// Get cell widths
+		const _thWidths = _th.map((el) => el.getBoundingClientRect().width);
+		const _tdWidths = _td.map((el) => el.getBoundingClientRect().width);
 
 		// Remove shadow table
 		this.el.removeChild(this.shadowTable);
 
-		// Set width
-		this.th.forEach((el, index) => this._setWidth(el, _th[index]));
-		this.td.forEach((el, index) => this._setWidth(el, _td[index]));
+		// Set cell widths
+		this.th.forEach((el, index) => this._setWidth(el, _thWidths[index]));
+		this.td.forEach((el, index) => this._setWidth(el, _tdWidths[index]));
 	}
 
 	/**

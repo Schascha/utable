@@ -10,6 +10,7 @@ export declare class UTable implements IUTable {
     get el(): HTMLDivElement;
     get buttonLeft(): HTMLButtonElement;
     get buttonRight(): HTMLButtonElement;
+    get columnCount(): number;
     get scrollerHead(): HTMLDivElement | undefined;
     get scrollerBody(): HTMLDivElement;
     get overlayLeft(): HTMLDivElement[];

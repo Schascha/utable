@@ -42,6 +42,10 @@ export class UTable {
         }
         return this._.buttonRight;
     }
+    get columnCount() {
+        var _a;
+        return Array.from(((_a = this.table.querySelector('tr')) === null || _a === void 0 ? void 0 : _a.children) || []).reduce((acc, el) => acc + (el.colSpan || 1), 0);
+    }
     get scrollerHead() {
         if (!this._.scrollerHead && this.tableHead) {
             this._.scrollerHead = this._createElement('div', {
@@ -310,21 +314,36 @@ export class UTable {
      * @private
      */
     _setEqualWidth() {
-        if (!this.tableHead || !this.shadowTable)
+        if (!this.shadowTable)
             return;
-        // Append shadow table
+        // Append shadow table and calculate table width
         this.el.prepend(this.shadowTable);
         const { marginLeft, marginRight } = window.getComputedStyle(this.table);
         const offset = (parseInt(marginLeft, 10) || 0) + (parseInt(marginRight, 10) || 0); // Remove table margin from width
-        this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
+        const _th = Array.from(this.shadowTable.querySelectorAll('thead > tr > *'));
+        const _td = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *'));
+        if (this.options.width === 'auto') {
+            this.shadowTable.style.tableLayout = 'auto';
+            this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
+        }
+        else {
+            const max = [..._th, ..._td]
+                .filter((el) => el.colSpan === 1)
+                .reduce((acc, el) => {
+                const width = el.getBoundingClientRect().width;
+                return width > acc ? width : acc;
+            }, 0);
+            this.shadowTable.style.tableLayout = 'fixed';
+            this.shadowTable.style.width = `${max * this.columnCount}px`;
+        }
         // Get cell widths
-        const _th = Array.from(this.shadowTable.querySelectorAll('thead > tr > *')).map((el) => el.getBoundingClientRect().width);
-        const _td = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')).map((el) => el.getBoundingClientRect().width);
+        const _thWidths = _th.map((el) => el.getBoundingClientRect().width);
+        const _tdWidths = _td.map((el) => el.getBoundingClientRect().width);
         // Remove shadow table
         this.el.removeChild(this.shadowTable);
-        // Set width
-        this.th.forEach((el, index) => this._setWidth(el, _th[index]));
-        this.td.forEach((el, index) => this._setWidth(el, _td[index]));
+        // Set cell widths
+        this.th.forEach((el, index) => this._setWidth(el, _thWidths[index]));
+        this.td.forEach((el, index) => this._setWidth(el, _tdWidths[index]));
     }
     /**
      * Set width to elements

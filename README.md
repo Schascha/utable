@@ -25,6 +25,7 @@ const table = new UTable('table', {
 | `buttons`            | boolean  | `true`         | Enable or disable buttons               |
 | `overlays`           | boolean  | `true`         | Enable or disable overlays              |
 | `sticky`             | boolean  | `true`         | Enable or disable sticky observer       |
+| `width`              | string   | `auto`         | Width of the table, auto or fixed       |
 | `classButtonLeft`    | string   | `button-left`  | Class name for left button              |
 | `classButtonRight`   | string   | `button-right` | Class name for right button             |
 | `classOverlayLeft`   | string   | `scroll-left`  | Class name for left overlay             |

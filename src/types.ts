@@ -9,6 +9,7 @@ export interface IUTable {
  * @props {boolean} buttons - Enable or disable buttons
  * @props {boolean} overlays - Enable or disable overlays
  * @props {boolean} sticky - Enable or disable sticky observer
+ * @props {string} width - Width of the table, auto or fixed
  * @props {string} classButtonLeft - Class name for left button
  * @props {string} classButtonRight - Class name for right button
  * @props {string} classOverlayLeft - Class name for left overlay
@@ -31,6 +32,7 @@ export interface IUTableOptions {
 	buttons: boolean;
 	overlays: boolean;
 	sticky: boolean;
+	width: 'auto' | 'fixed';
 	classButtonLeft: string;
 	classButtonRight: string;
 	classOverlayLeft: string;
