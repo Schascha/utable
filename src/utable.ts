@@ -88,13 +88,6 @@ export class UTable implements IUTable {
 		return this._.buttonRight;
 	}
 
-	get columnCount(): number {
-		return Array.from(this.table.querySelector('tr')?.children || []).reduce(
-			(acc, el) => acc + ((el as HTMLTableCellElement).colSpan || 1),
-			0
-		);
-	}
-
 	get scrollerHead(): HTMLDivElement | undefined {
 		if (!this._.scrollerHead && this.tableHead) {
 			this._.scrollerHead = this._createElement('div', {
@@ -418,18 +411,30 @@ export class UTable implements IUTable {
 		const _td = Array.from(
 			this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')
 		) as HTMLTableCellElement[];
-		if (this.options.width === 'auto') {
-			this.shadowTable.style.tableLayout = 'auto';
-			this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
-		} else {
+		this.shadowTable.style.tableLayout = 'auto';
+		this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
+
+		// Fixed width
+		if (this.options.width === 'fixed') {
+			// Get first row and calculate column count
+			const tr = Array.from(
+				(this.shadowTable.querySelector('tr')?.children ||
+					[]) as HTMLTableCellElement[]
+			);
+			const columnCount = tr.reduce((acc, el) => acc + (el.colSpan || 1), 0);
+			// Set equal column width
+			tr.forEach(
+				(el) => (el.style.width = `${(100 / columnCount) * (el.colSpan || 1)}%`)
+			);
+			// Get max cell width
 			const max = [..._th, ..._td]
 				.filter((el) => el.colSpan === 1)
 				.reduce((acc, el) => {
 					const width = el.getBoundingClientRect().width;
 					return width > acc ? width : acc;
 				}, 0);
-			this.shadowTable.style.tableLayout = 'fixed';
-			this.shadowTable.style.width = `${max * this.columnCount}px`;
+			// Update shadow table width depending on max cell width
+			this.shadowTable.style.width = `${max * columnCount}px`;
 		}
 
 		// Get cell widths
