@@ -185,8 +185,10 @@ export class UTable {
         if (!Object.keys(this._).length) {
             return this.render();
         }
+        const { onUpdate } = this.options;
         this._setEqualWidth();
         this._isScrollable();
+        typeof onUpdate === 'function' && onUpdate();
         return this;
     }
     /**

@@ -4,6 +4,8 @@
 
 > Just a responsive table plugin
 
+https://schascha.github.io/utable/
+
 ## Installation
 
 ```sh
@@ -43,9 +45,24 @@ const table = new UTable('table', {
 | `onClickButtonRight` | function | -              | Callback function on right button click |
 | `onScroll`           | function | -              | Callback function on scroll             |
 | `onScrollend`        | function | -              | Callback function on scroll end         |
+| `onUpdate`           | function | -              | Callback function on update             |
 
 ## Styles
 
 The table is highly customizable and does not force you to embed styles. However, it is recommended to apply at least some base styles to ensure the table displays correctly. You can rewrite CSS classes or deactivate features, like buttons or overlay, via the module configuration. Just use it as you need it for your layout.
 
 Basic styles and an example table layout can be found here: [utable.css](docs/utable.css)
+
+## Bugs? 🐛
+
+Please let me know: https://github.com/Schascha/utable/issues
+
+## Buy me a Coffee ☕
+
+Support this project and [others](https://github.com/Schascha?tab=repositories) via [PayPal](https://www.paypal.me/LosZahlos). Thanks
+
+## License
+
+[MIT](./LICENSE)
+
+Copyright (c) 2024 Sascha Künstler

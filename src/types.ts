@@ -27,6 +27,7 @@ export interface IUTable {
  * @props {Function} onClickButtonRight - Callback function on right button click
  * @props {Function} onScroll - Callback function on scroll
  * @props {Function} onScrollend - Callback function on scroll end
+ * @props {Function} onUpdate - Callback function on update
  */
 export interface IUTableOptions {
 	buttons: boolean;
@@ -50,4 +51,5 @@ export interface IUTableOptions {
 	onClickButtonRight?: Function;
 	onScroll?: Function;
 	onScrollend?: Function;
+	onUpdate?: Function;
 }
