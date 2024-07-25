@@ -9,324 +9,302 @@
 	</head>
 
 	<body>
-		<h1>utable</h1>
+		<header>
+			<h1>uTable</h1>
 
-		<table>
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Age</th>
-					<th>Role</th>
-					<th>Species</th>
-					<th>Origin</th>
-					<th>Weapon</th>
-					<th>Gender</th>
-					<th>Hair</th>
-					<th>Height</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Frodo Baggins</td>
-					<td>50</td>
-					<td>Ring bearer</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
-					<td>Sting</td>
-					<td>Male</td>
-					<td>Brown</td>
-					<td>3'6"</td>
-				</tr>
-				<tr>
-					<td>Samwise Gamgee</td>
-					<td>38</td>
-					<td>Gardener</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
-					<td>Barrow-blade</td>
-					<td>Male</td>
-					<td>Brown</td>
-					<td>3'6"</td>
-				</tr>
-				<tr>
-					<td>Meriadoc Brandybuck</td>
-					<td>36</td>
-					<td>Adventurer</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
-					<td>Barrow-blade</td>
-					<td>Male</td>
-					<td>Brown</td>
-					<td>3'6"</td>
-				</tr>
-				<tr>
-					<td>Peregrin Took</td>
-					<td>28</td>
-					<td>Adventurer</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
-					<td>Barrow-blade</td>
-					<td>Male</td>
-					<td>Brown</td>
-					<td>3'6"</td>
-				</tr>
-				<tr>
-					<td>Aragorn</td>
-					<td>88</td>
-					<td>Ranger</td>
-					<td>Human</td>
-					<td>Arnor</td>
-					<td>Anduril</td>
-					<td>Male</td>
-					<td>Black</td>
-					<td>6'6"</td>
-				</tr>
-			</tbody>
-		</table>
+			<form>
+				<label class="switch">
+					<input type="checkbox" id="buttons" checked />
+					<span class="switch-slider"></span>
+					<span class="switch-label">Buttons</span>
+				</label>
 
-		<h2>Without table head</h2>
+				<label class="switch">
+					<input type="checkbox" id="overlays" checked />
+					<span class="switch-slider"></span>
+					<span class="switch-label">Overlays</span>
+				</label>
 
-		<table>
-			<tr>
-				<td>Sauron</td>
-				<td>Unknown</td>
-				<td>Dark Lord</td>
-				<td>Maiar</td>
-				<td>Mordor</td>
-			</tr>
-			<tr>
-				<td>Saruman</td>
-				<td>Unknown</td>
-				<td>Wizard</td>
-				<td>Maiar</td>
-				<td>Isengard</td>
-			</tr>
-			<tr>
-				<td>Shelob</td>
-				<td>Unknown</td>
-				<td>Spider</td>
-				<td>Spider</td>
-				<td>Cirith Ungol</td>
-			</tr>
-			<tr>
-				<td>Witch-king of Angmar</td>
-				<td>Unknown</td>
-				<td>Wraith</td>
-				<td>Human</td>
-				<td>Angmar</td>
-			</tr>
-			<tr>
-				<td>Balrog of Moria</td>
-				<td>Unknown</td>
-				<td>Demon</td>
-				<td>Maiar</td>
-				<td>Moria</td>
-			</tr>
-		</table>
+				<label class="switch">
+					<input type="checkbox" id="width" />
+					<span class="switch-slider"></span>
+					<span class="switch-label">Fixed</span>
+				</label>
+			</form>
+		</header>
 
-		<h2>With colspans</h2>
+		<main>
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Age</th>
+						<th>Role</th>
+						<th>Species</th>
+						<th>Origin</th>
+						<th>Weapon</th>
+						<th>Gender</th>
+						<th>Hair</th>
+						<th>Height</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Frodo Baggins</td>
+						<td>50</td>
+						<td>Ring bearer</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+						<td>Sting</td>
+						<td>Male</td>
+						<td>Brown</td>
+						<td>3'6"</td>
+					</tr>
+					<tr>
+						<td>Samwise Gamgee</td>
+						<td>38</td>
+						<td>Gardener</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+						<td>Barrow-blade</td>
+						<td>Male</td>
+						<td>Brown</td>
+						<td>3'6"</td>
+					</tr>
+					<tr>
+						<td>Meriadoc Brandybuck</td>
+						<td>36</td>
+						<td>Adventurer</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+						<td>Barrow-blade</td>
+						<td>Male</td>
+						<td>Brown</td>
+						<td>3'6"</td>
+					</tr>
+					<tr>
+						<td>Peregrin Took</td>
+						<td>28</td>
+						<td>Adventurer</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+						<td>Barrow-blade</td>
+						<td>Male</td>
+						<td>Brown</td>
+						<td>3'6"</td>
+					</tr>
+					<tr>
+						<td>Aragorn</td>
+						<td>88</td>
+						<td>Ranger</td>
+						<td>Human</td>
+						<td>Arnor</td>
+						<td>Anduril</td>
+						<td>Male</td>
+						<td>Black</td>
+						<td>6'6"</td>
+					</tr>
+				</tbody>
+			</table>
 
-		<table>
-			<thead>
+			<h2>Without table head</h2>
+
+			<table>
 				<tr>
-					<th>Name</th>
-					<th>Age</th>
-					<th colspan="3">Info</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Bilbo Baggins</td>
-					<td>111</td>
-					<td>Adventurer</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
+					<td>Sauron</td>
+					<td>Unknown</td>
+					<td>Dark Lord</td>
+					<td>Maiar</td>
+					<td>Mordor</td>
 				</tr>
 				<tr>
-					<td>Gollum</td>
-					<td>589</td>
-					<td>Ring bearer</td>
-					<td>Hobbit</td>
-					<td>Misty Mountains</td>
-				</tr>
-				<tr>
-					<td>Gandalf</td>
-					<td>2000+</td>
+					<td>Saruman</td>
+					<td>Unknown</td>
 					<td>Wizard</td>
 					<td>Maiar</td>
-					<td>Valinor</td>
+					<td>Isengard</td>
 				</tr>
 				<tr>
-					<td>Legolas</td>
-					<td>2931</td>
-					<td>Archer</td>
-					<td>Elf</td>
-					<td>Mirkwood</td>
-				</tr>
-				<tr>
-					<td>Gimli</td>
-					<td>139</td>
-					<td>Warrior</td>
-					<td>Dwarf</td>
-					<td>Erebor</td>
-				</tr>
-			</tbody>
-		</table>
-
-		<table>
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Age</th>
-					<th colspan="3">
-						Info about the character like role, species and origin in
-						Middle-earth
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Boromir</td>
-					<td>41</td>
-					<td>Warrior</td>
-					<td>Human</td>
-					<td>Gondor</td>
-				</tr>
-				<tr>
-					<td>Faramir</td>
-					<td>36</td>
-					<td>Warrior</td>
-					<td>Human</td>
-					<td>Gondor</td>
-				</tr>
-				<tr>
-					<td>Denethor</td>
-					<td>89</td>
-					<td>Steward</td>
-					<td>Human</td>
-					<td>Gondor</td>
-				</tr>
-				<tr>
-					<td>Theoden</td>
-					<td>71</td>
-					<td>King</td>
-					<td>Human</td>
-					<td>Rohan</td>
-				</tr>
-				<tr>
-					<td>Eowyn</td>
-					<td>24</td>
-					<td>Shieldmaiden</td>
-					<td>Human</td>
-					<td>Rohan</td>
-				</tr>
-			</tbody>
-		</table>
-
-		<table>
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Age</th>
-					<th>Role</th>
-					<th>Species</th>
-					<th>Origin</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Galadriel</td>
-					<td>7000+</td>
-					<td colspan="3">Elf queen of Lothlorien</td>
-				</tr>
-				<tr>
-					<td>Elrond</td>
-					<td>6000+</td>
-					<td colspan="3">Elf lord of Rivendell</td>
-				</tr>
-				<tr>
-					<td>Arwen</td>
-					<td>3000+</td>
-					<td colspan="3">Elf princess of Rivendell</td>
-				</tr>
-				<tr>
-					<td>Treebeard</td>
+					<td>Shelob</td>
 					<td>Unknown</td>
-					<td>Shepherd of the Trees</td>
-					<td>Ent</td>
-					<td>Fangorn Forest</td>
+					<td>Spider</td>
+					<td>Spider</td>
+					<td>Cirith Ungol</td>
 				</tr>
 				<tr>
-					<td>Tom Bombadil</td>
+					<td>Witch-king of Angmar</td>
 					<td>Unknown</td>
-					<td>Master</td>
-					<td>Unknown</td>
-					<td>Old Forest</td>
-				</tr>
-			</tbody>
-		</table>
-
-		<h2>Without buttons and overlays</h2>
-		<table
-			data-options='{
-				"buttons": false,
-				"overlays": false,
-				"sticky": false
-			}'
-		>
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Age</th>
-					<th>Role</th>
-					<th>Species</th>
-					<th>Origin</th>
-					<th>Weapon</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Frodo Baggins</td>
-					<td>50</td>
-					<td>Ring bearer</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
-					<td>Sting</td>
-				</tr>
-				<tr>
-					<td>Samwise Gamgee</td>
-					<td>38</td>
-					<td>Gardener</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
-					<td>Barrow-blade</td>
-				</tr>
-				<tr>
-					<td>Meriadoc Brandybuck</td>
-					<td>36</td>
-					<td>Adventurer</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
-					<td>Barrow-blade</td>
-				</tr>
-				<tr>
-					<td>Peregrin Took</td>
-					<td>28</td>
-					<td>Adventurer</td>
-					<td>Hobbit</td>
-					<td>Shire</td>
-					<td>Barrow-blade</td>
-				</tr>
-				<tr>
-					<td>Aragorn</td>
-					<td>88</td>
-					<td>Ranger</td>
+					<td>Wraith</td>
 					<td>Human</td>
-					<td>Arnor</td>
-					<td>Anduril</td>
+					<td>Angmar</td>
 				</tr>
-			</tbody>
-		</table>
+				<tr>
+					<td>Balrog of Moria</td>
+					<td>Unknown</td>
+					<td>Demon</td>
+					<td>Maiar</td>
+					<td>Moria</td>
+				</tr>
+			</table>
+
+			<h2>With colspans</h2>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Age</th>
+						<th colspan="3">Info</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Bilbo Baggins</td>
+						<td>111</td>
+						<td>Adventurer</td>
+						<td>Hobbit</td>
+						<td>Shire</td>
+					</tr>
+					<tr>
+						<td>Gollum</td>
+						<td>589</td>
+						<td>Ring bearer</td>
+						<td>Hobbit</td>
+						<td>Misty Mountains</td>
+					</tr>
+					<tr>
+						<td>Gandalf</td>
+						<td>2000+</td>
+						<td>Wizard</td>
+						<td>Maiar</td>
+						<td>Valinor</td>
+					</tr>
+					<tr>
+						<td>Legolas</td>
+						<td>2931</td>
+						<td>Archer</td>
+						<td>Elf</td>
+						<td>Mirkwood</td>
+					</tr>
+					<tr>
+						<td>Gimli</td>
+						<td>139</td>
+						<td>Warrior</td>
+						<td>Dwarf</td>
+						<td>Erebor</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Age</th>
+						<th colspan="3">
+							Info about the character like role, species and origin in
+							Middle-earth
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Boromir</td>
+						<td>41</td>
+						<td>Warrior</td>
+						<td>Human</td>
+						<td>Gondor</td>
+					</tr>
+					<tr>
+						<td>Faramir</td>
+						<td>36</td>
+						<td>Warrior</td>
+						<td>Human</td>
+						<td>Gondor</td>
+					</tr>
+					<tr>
+						<td>Denethor</td>
+						<td>89</td>
+						<td>Steward</td>
+						<td>Human</td>
+						<td>Gondor</td>
+					</tr>
+					<tr>
+						<td>Theoden</td>
+						<td>71</td>
+						<td>King</td>
+						<td>Human</td>
+						<td>Rohan</td>
+					</tr>
+					<tr>
+						<td>Eowyn</td>
+						<td>24</td>
+						<td>Shieldmaiden</td>
+						<td>Human</td>
+						<td>Rohan</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Age</th>
+						<th>Role</th>
+						<th>Species</th>
+						<th>Origin</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Galadriel</td>
+						<td>7000+</td>
+						<td colspan="3">Elf queen of Lothlorien</td>
+					</tr>
+					<tr>
+						<td>Elrond</td>
+						<td>6000+</td>
+						<td colspan="3">Elf lord of Rivendell</td>
+					</tr>
+					<tr>
+						<td>Arwen</td>
+						<td>3000+</td>
+						<td colspan="3">Elf princess of Rivendell</td>
+					</tr>
+					<tr>
+						<td>Treebeard</td>
+						<td>Unknown</td>
+						<td>Shepherd of the Trees</td>
+						<td>Ent</td>
+						<td>Fangorn Forest</td>
+					</tr>
+					<tr>
+						<td>Tom Bombadil</td>
+						<td>Unknown</td>
+						<td>Master</td>
+						<td>Unknown</td>
+						<td>Old Forest</td>
+					</tr>
+				</tbody>
+			</table>
+		</main>
+
+		<footer>
+			<a
+				href="https://github.com/Schascha/utable"
+				rel="noopener noreferrer"
+				target="_blank"
+				title="View on GitHub"
+			>
+				<svg height="32" viewBox="0 0 16 16" width="32">
+					<path
+						d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"
+					/>
+				</svg>
+				<span class="sr-only">GitHub</span>
+			</a>
+		</footer>
 	</body>
 
 	<script src="utable.js"></script>
@@ -346,5 +324,33 @@
 				},
 			}),
 		}));
+
+		function update(options) {
+			tables.forEach(({ el, table }) => {
+				el.dataset.options = JSON.stringify(options);
+				table.destroy();
+				table.render();
+			});
+		}
+
+		const options = {};
+
+		const buttons = document.getElementById('buttons');
+		buttons.addEventListener('change', (e) => {
+			options.buttons = e.target.checked;
+			update(options);
+		});
+
+		const overlays = document.getElementById('overlays');
+		overlays.addEventListener('change', (e) => {
+			options.overlays = e.target.checked;
+			update(options);
+		});
+
+		const width = document.getElementById('width');
+		width.addEventListener('change', (e) => {
+			options.width = e.target.checked ? 'fixed' : 'auto';
+			update(options);
+		});
 	</script>
 </html>
