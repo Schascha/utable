@@ -43,3 +43,9 @@ const table = new UTable('table', {
 | `onClickButtonRight` | function | -              | Callback function on right button click |
 | `onScroll`           | function | -              | Callback function on scroll             |
 | `onScrollend`        | function | -              | Callback function on scroll end         |
+
+## Styles
+
+The table is highly customizable and does not force you to embed styles. You can rewrite CSS classes or deactivate features, like buttons or overlay, via the module configuration. Just use it as you need it for your layout.
+
+You find a example here: [utable.css](docs/utable.css)
