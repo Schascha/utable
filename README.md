@@ -46,6 +46,6 @@ const table = new UTable('table', {
 
 ## Styles
 
-The table is highly customizable and does not force you to embed styles. You can rewrite CSS classes or deactivate features, like buttons or overlay, via the module configuration. Just use it as you need it for your layout.
+The table is highly customizable and does not force you to embed styles. However, it is recommended to apply at least some base styles to ensure the table displays correctly. You can rewrite CSS classes or deactivate features, like buttons or overlay, via the module configuration. Just use it as you need it for your layout.
 
-You find a example here: [utable.css](docs/utable.css)
+Basic styles and an example table layout can be found here: [utable.css](docs/utable.css)
