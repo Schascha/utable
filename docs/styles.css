@@ -16,7 +16,8 @@ body {
 	padding: 6rem 1.5rem;
 	min-height: 200vh;
 	max-width: 760px;
-	background: #f7f7f7;
+	background: #fff;
+	color: #1D3238;
 }
 
 h1 {
@@ -36,7 +37,8 @@ p {
 /* uTable */
 
 :root {
-	--table-odd-bg-color: #f7f7f7;
+	--table-odd-bg-color: #f8f8f9;
+	--table-header-bg-color: #F5C95E;
 	--table-bg-color: white;
 	--table-button-size: 2rem;
 }
@@ -64,7 +66,7 @@ p {
 	}
 
 	& tbody tr:nth-of-type(odd) {
-	background-color: var(--table-odd-bg-color);
+		background-color: var(--table-odd-bg-color);
 	}
 
 	& .scroller {
@@ -82,7 +84,7 @@ p {
 		flex-wrap: wrap;
 		position: sticky;
 		top: 0;
-		background-color: white;
+		background-color: var(--table-bg-color);
 		z-index: 3;
 
 		& .scroller {
@@ -93,8 +95,13 @@ p {
 			}
 		}
 
+		& table {
+			background-color: var(--table-header-bg-color);
+			border-radius: 6px 6px 0 0 ;
+		}
+
 		&.is-sticky {
-			box-shadow: 0 3px 20px rgba(0, 0, 0, 0.1);
+			box-shadow: 0 20px 20px -20px rgba(0, 0, 0, 0.1);
 		}
 	}
 
@@ -139,7 +146,7 @@ p {
 		width: var(--table-button-size);
 		height: var(--table-button-size);
 		padding: 0;
-		border: 1px solid #ccc;
+		border: 1px solid currentColor;
 		border-radius: 999em;
 		background: transparent no-repeat center;
 		background-size: 35%;
