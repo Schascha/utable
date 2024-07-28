@@ -30,6 +30,11 @@
 					<span class="switch-slider"></span>
 					<span class="switch-label">Fixed</span>
 				</label>
+
+				<div class="styles">
+					<button type="button" id="style">Change styles</button>
+					<pre><code id="code"></code></pre>
+				</div>
 			</form>
 		</header>
 
@@ -325,7 +330,9 @@
 			}),
 		}));
 
-		function update(options) {
+		const options = {};
+
+		function update() {
 			tables.forEach(({ el, table }) => {
 				el.dataset.options = JSON.stringify(options);
 				table.destroy();
@@ -333,24 +340,79 @@
 			});
 		}
 
-		const options = {};
-
 		const buttons = document.getElementById('buttons');
 		buttons.addEventListener('change', (e) => {
 			options.buttons = e.target.checked;
-			update(options);
+			update();
 		});
 
 		const overlays = document.getElementById('overlays');
 		overlays.addEventListener('change', (e) => {
 			options.overlays = e.target.checked;
-			update(options);
+			update();
 		});
 
 		const width = document.getElementById('width');
 		width.addEventListener('change', (e) => {
 			options.width = e.target.checked ? 'fixed' : 'auto';
-			update(options);
+			update();
+		});
+
+		const styleButton = document.getElementById('style');
+		const code = document.getElementById('code');
+		const styles = [
+			`.thead table {
+	background-color: #f5c95e;
+	border-radius: 6px 6px 0 0 ;
+}
+
+.tbody tr:nth-of-type(odd) {
+	background-color: #f8f8f9;
+}`,
+			`.thead table {
+	background-color: #e5f2ff;
+	border-radius: 6px 6px 0 0 ;
+}
+
+.tbody td {
+	border-bottom: 1px solid #e0e0e0;
+}`,
+			`.thead table {
+	background-color: #222;
+	color: #fff;
+}
+
+td {
+	border: 1px solid #e0e0e0;
+}`,
+			`.thead table {
+	background-color: #1089ff;
+	color: #fff;
+}
+
+.tbody td {
+	border-bottom: 3px solid #f8f9fd;
+}`,
+		];
+		let activeStyle = styles[0];
+
+		function styleChange(style = activeStyle) {
+			let styleEl = document.getElementById('dynamicStyle');
+			if (!styleEl) {
+				styleEl = document.createElement('style');
+				styleEl.id = 'dynamicStyle';
+				document.head.appendChild(styleEl);
+			}
+			styleEl.textContent = style;
+			code.textContent = style;
+			activeStyle = style;
+			update();
+		}
+
+		styleChange();
+		styleButton.addEventListener('click', () => {
+			const _styles = styles.filter((style) => style !== activeStyle);
+			styleChange(_styles[Math.floor(Math.random() * _styles.length)]);
 		});
 	</script>
 </html>

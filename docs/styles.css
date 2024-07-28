@@ -1,7 +1,11 @@
 /* Layout */
 
 :root {
-	--color-focus: #2196F3;
+	--color-focus: #2196f3;
+	--color-code-bg: #201c29;
+	--color-code-text: #f5d67b;
+	--color-form-active: #2196F3;
+	--color-form-inactive: #ccc;
 }
 
 html {
@@ -75,6 +79,29 @@ footer {
 	border-width: 0;
 }
 
+/* Styles */
+
+
+.styles {
+	& button {
+		background-color: var(--color-form-active);
+		color: white;
+		border: none;
+		border-radius: 0.25rem;
+		padding: 0.5rem 1rem;
+		cursor: pointer;
+	}
+
+	& pre {
+		font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+		border-radius: 8px;
+		padding: 1rem;
+		background-color: var(--color-code-bg);
+		color: var(--color-code-text);
+		margin: 0.5rem 0 0;
+	}
+}
+
 /* Switch */
 
 .switch {
@@ -94,7 +121,7 @@ footer {
 
 	& .switch-slider {
 		position: relative;
-		background-color: #ccc;
+		background-color: var(--color-form-inactive);
 		transition: 0.4s;
 		border-radius: 1.5rem;
 		width: 3rem;
@@ -114,7 +141,7 @@ footer {
 	}
 
 	& input:checked + .switch-slider {
-		background-color: #2196F3;
+		background-color: var(--color-form-active);
 	}
 
 	& input:checked + .switch-slider:before {

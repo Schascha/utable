@@ -38,11 +38,6 @@
 
 /* Custom styles */
 
-:root {
-	--table-odd-bg-color: #f8f8f9;
-	--table-header-bg-color: #f5c95e;
-}
-
 .utable {
 	margin: 0 0 3rem;
 
@@ -52,19 +47,10 @@
 		text-align: left;
 	}
 
-	& tbody tr:nth-of-type(odd) {
-		background-color: var(--table-odd-bg-color);
-	}
-
 	& .thead {
 		display: flex;
 		justify-content: flex-end;
 		flex-wrap: wrap;
-
-		& table {
-			background-color: var(--table-header-bg-color);
-			border-radius: 6px 6px 0 0 ;
-		}
 	}
 }
 
