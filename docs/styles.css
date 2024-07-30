@@ -21,10 +21,14 @@ html {
 
 body {
 	margin: 0 auto;
-	padding: 6rem 1.5rem;
+	padding: 3rem 1.5rem;
 	max-width: 760px;
 	background: #fff;
 	color: #1D3238;
+
+	@media (min-width: 760px) {
+		padding: 6rem 1.5rem;
+	}
 }
 
 h1 {
@@ -93,6 +97,7 @@ footer {
 	}
 
 	& pre {
+		overflow-x: auto;
 		font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
 		border-radius: 8px;
 		padding: 1rem;
