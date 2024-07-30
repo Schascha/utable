@@ -45,21 +45,6 @@ export declare class UTable implements IUTable {
      */
     _createButton(className: string, text: string, title: string, event: (e: Event) => void): HTMLButtonElement;
     /**
-     * Create element
-     * @param {K} tag
-     * @param {Object} options - Element options
-     * @param {string} options.className - Element class name
-     * @param {string} options.insertMethod - Insert method, default is append
-     * @param {Element} options.parent - Parent element
-     * @private
-     * @returns {HTMLElementTagNameMap[K]} - Element
-     */
-    _createElement<K extends keyof HTMLElementTagNameMap>(tag: K, options?: {
-        className?: string;
-        insertMethod?: 'prepend' | 'append' | 'before' | 'after';
-        parent?: Element;
-    }): HTMLElementTagNameMap[K];
-    /**
      * Create overlay
      * @param {string} className - Overlay class name
      * @private

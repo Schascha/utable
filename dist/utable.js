@@ -1,4 +1,5 @@
 import { UTableDefaults } from './defaults';
+import { createElement } from './utils';
 export class UTable {
     constructor(table, options) {
         this.table = (typeof table === 'string' ? document.querySelector(table) : table);
@@ -19,7 +20,7 @@ export class UTable {
     }
     get el() {
         if (!this._.el) {
-            this._.el = this._createElement('div', {
+            this._.el = createElement('div', {
                 className: this.options.classWrapper,
                 insertMethod: 'before',
                 parent: this.table,
@@ -44,7 +45,7 @@ export class UTable {
     }
     get scrollerHead() {
         if (!this._.scrollerHead && this.tableHead) {
-            this._.scrollerHead = this._createElement('div', {
+            this._.scrollerHead = createElement('div', {
                 className: this.options.classScroller,
             });
             this._.scrollerHead.appendChild(this.tableHead);
@@ -54,7 +55,7 @@ export class UTable {
     get scrollerBody() {
         if (!this._.scrollerBody) {
             const { classScroller, onScrollend } = this.options;
-            const el = this._createElement('div', { className: classScroller });
+            const el = createElement('div', { className: classScroller });
             el.appendChild(this.tableBody);
             el.addEventListener('scroll', this._onScroll);
             onScrollend && el.addEventListener('scrollend', this._onScrollend);
@@ -87,7 +88,7 @@ export class UTable {
         if (typeof this._.tableHead === 'undefined') {
             const thead = (_a = this.el) === null || _a === void 0 ? void 0 : _a.querySelector('thead');
             if (thead) {
-                this._.tableHead = document.createElement('table');
+                this._.tableHead = createElement('table');
                 this._.tableHead.appendChild(thead);
             }
             else {
@@ -106,7 +107,7 @@ export class UTable {
     }
     get top() {
         if (!this._.top) {
-            this._.top = this._createElement('div', {
+            this._.top = createElement('div', {
                 className: this.options.classTop,
                 parent: this.el,
                 insertMethod: 'prepend',
@@ -116,7 +117,7 @@ export class UTable {
     }
     get trackBody() {
         if (!this._.trackBody) {
-            this._.trackBody = this._createElement('div', {
+            this._.trackBody = createElement('div', {
                 className: `${this.options.classTrack} tbody`,
             });
             this._.trackBody.appendChild(this.scrollerBody);
@@ -125,7 +126,7 @@ export class UTable {
     }
     get trackHead() {
         if (!this._.trackHead && this.scrollerHead) {
-            this._.trackHead = this._createElement('div', {
+            this._.trackHead = createElement('div', {
                 className: `${this.options.classTrack} thead`,
             });
             this._.trackHead.appendChild(this.scrollerHead);
@@ -200,7 +201,7 @@ export class UTable {
      * @returns {HTMLButtonElement} - Button element
      */
     _createButton(className, text, title, event) {
-        const button = this._createElement('button', {
+        const button = createElement('button', {
             className,
             parent: this.trackHead,
             insertMethod: 'prepend',
@@ -212,34 +213,16 @@ export class UTable {
         return button;
     }
     /**
-     * Create element
-     * @param {K} tag
-     * @param {Object} options - Element options
-     * @param {string} options.className - Element class name
-     * @param {string} options.insertMethod - Insert method, default is append
-     * @param {Element} options.parent - Parent element
-     * @private
-     * @returns {HTMLElementTagNameMap[K]} - Element
-     */
-    _createElement(tag, options = {}) {
-        const el = document.createElement(tag);
-        const { className, insertMethod, parent } = options;
-        if (className)
-            el.className = className;
-        if (parent)
-            parent[insertMethod || 'append'](el);
-        return el;
-    }
-    /**
      * Create overlay
      * @param {string} className - Overlay class name
      * @private
      * @returns {HTMLDivElement[]} - Overlay elements
      */
     _createOverlay(className) {
-        const { _createElement: $, trackBody, trackHead } = this;
-        const el = [$('div', { className, parent: trackBody })];
-        trackHead && el.push($('div', { className, parent: trackHead }));
+        const { trackBody, trackHead } = this;
+        const el = [createElement('div', { className, parent: trackBody })];
+        trackHead &&
+            el.push(createElement('div', { className, parent: trackHead }));
         return el;
     }
     /**
