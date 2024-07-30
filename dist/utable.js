@@ -318,26 +318,23 @@ export class UTable {
         const _th = Array.from(this.shadowTable.querySelectorAll('thead > tr > *'));
         const _td = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *'));
         setStyles(this.shadowTable, {
-            width: 'auto',
             tableLayout: 'auto',
+            width: `${this.el.clientWidth - offset}px`,
         });
         // Fixed width
         if (this.options.width === 'fixed') {
-            // Get first row and calculate column count
-            const tr = Array.from((((_a = this.shadowTable.querySelector('tr')) === null || _a === void 0 ? void 0 : _a.children) ||
+            // Get first row cells and calculate column count
+            const cells = Array.from((((_a = this.shadowTable.querySelector('tr')) === null || _a === void 0 ? void 0 : _a.children) ||
                 []));
-            const columnCount = tr.reduce((acc, el) => acc + (el.colSpan || 1), 0);
+            const colums = cells.reduce((acc, el) => acc + (el.colSpan || 1), 0);
             // Set equal column width
-            tr.forEach((el) => setStyles(el, { width: `${(100 / columnCount) * (el.colSpan || 1)}%` }));
+            cells.forEach((el) => setStyles(el, { width: `${(100 / colums) * (el.colSpan || 1)}%` }));
             // Get max cell width
-            const max = [..._th, ..._td]
+            const max = Math.max(...[..._th, ..._td]
                 .filter((el) => el.colSpan === 1)
-                .reduce((acc, el) => {
-                const width = el.getBoundingClientRect().width;
-                return width > acc ? width : acc;
-            }, 0);
+                .map((el) => el.getBoundingClientRect().width));
             // Update shadow table width depending on max cell width
-            setStyles(this.shadowTable, { width: `${max * columnCount + offset}px` });
+            setStyles(this.shadowTable, { width: `${max * colums}px` });
         }
         // Get cell widths
         const _thWidths = _th.map((el) => el.getBoundingClientRect().width);

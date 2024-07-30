@@ -384,31 +384,30 @@ export class UTable implements IUTable {
 			this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')
 		) as HTMLTableCellElement[];
 		setStyles(this.shadowTable, {
-			width: 'auto',
 			tableLayout: 'auto',
+			width: `${this.el.clientWidth - offset}px`,
 		});
 
 		// Fixed width
 		if (this.options.width === 'fixed') {
-			// Get first row and calculate column count
-			const tr = Array.from(
+			// Get first row cells and calculate column count
+			const cells = Array.from(
 				(this.shadowTable.querySelector('tr')?.children ||
 					[]) as HTMLTableCellElement[]
 			);
-			const columnCount = tr.reduce((acc, el) => acc + (el.colSpan || 1), 0);
+			const colums = cells.reduce((acc, el) => acc + (el.colSpan || 1), 0);
 			// Set equal column width
-			tr.forEach((el) =>
-				setStyles(el, { width: `${(100 / columnCount) * (el.colSpan || 1)}%` })
+			cells.forEach((el) =>
+				setStyles(el, { width: `${(100 / colums) * (el.colSpan || 1)}%` })
 			);
 			// Get max cell width
-			const max = [..._th, ..._td]
-				.filter((el) => el.colSpan === 1)
-				.reduce((acc, el) => {
-					const width = el.getBoundingClientRect().width;
-					return width > acc ? width : acc;
-				}, 0);
+			const max = Math.max(
+				...[..._th, ..._td]
+					.filter((el) => el.colSpan === 1)
+					.map((el) => el.getBoundingClientRect().width)
+			);
 			// Update shadow table width depending on max cell width
-			setStyles(this.shadowTable, { width: `${max * columnCount + offset}px` });
+			setStyles(this.shadowTable, { width: `${max * colums}px` });
 		}
 
 		// Get cell widths
