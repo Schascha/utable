@@ -36,6 +36,11 @@ export declare class UTable implements IUTable {
      */
     update(): this;
     /**
+     * Bind events
+     * @private
+     */
+    _bindEvents(): void;
+    /**
      * Create button
      * @param {string} className - Button class name
      * @param {string} text - Button text
@@ -89,15 +94,30 @@ export declare class UTable implements IUTable {
      * Toggle button visibility
      * @param {HTMLButtonElement} el - Button element
      * @param {boolean} isActive - Is active
+     * @private
      */
     _toggleButton(el: HTMLButtonElement, isActive: boolean): void;
     /**
+     * Toggle buttons visibility
+     * @param {boolean} isScrollLeft - Is scroll left
+     * @param {boolean} isScrollRight - Is scroll right
+     * @private
+     */
+    _toggleButtons(isScrollLeft: boolean, isScrollRight: boolean): void;
+    /**
      * Toggle overlay visibility
-     * @param {HTMLElement} el - Overlay element
+     * @param {HTMLDivElement} el - Overlay element
      * @param {boolean} isActive - Is active
      * @private
      */
-    _toggleOverlay(el: HTMLElement, isActive: boolean): void;
+    _toggleOverlay(el: HTMLDivElement, isActive: boolean): void;
+    /**
+     * Toggle overlays visibility
+     * @param isScrollLeft - Is scroll left
+     * @param isScrollRight - Is scroll right
+     * @private
+     */
+    _toggleOverlays(isScrollLeft: boolean, isScrollRight: boolean): void;
     /**
      * Button left click event
      * @private
@@ -118,5 +138,9 @@ export declare class UTable implements IUTable {
      * @private
      */
     _onScroll(e: Event): void;
+    /**
+     * Scrollend event
+     * @private
+     */
     _onScrollend(e: Event): void;
 }

@@ -32,7 +32,7 @@ const table = new UTable('table', {
 | `classBody`          | string   | `tbody`        | Class name for body element             |
 | `classButtonLeft`    | string   | `button-left`  | Class name for left button              |
 | `classButtonRight`   | string   | `button-right` | Class name for right button             |
-| `classHead`          | string   | `tbody`        | Class name for head element             |
+| `classHead`          | string   | `thead`        | Class name for head element             |
 | `classOverlayLeft`   | string   | `scroll-left`  | Class name for left overlay             |
 | `classOverlayRight`  | string   | `scroll-right` | Class name for right overlay            |
 | `classScroller`      | string   | `scroller`     | Class name for scroller                 |

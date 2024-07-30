@@ -1,5 +1,5 @@
 import { UTableDefaults } from './defaults';
-import { createElement } from './utils';
+import { createElement, setStyles } from './utils';
 export class UTable {
     constructor(table, options) {
         this.table = (typeof table === 'string' ? document.querySelector(table) : table);
@@ -10,12 +10,7 @@ export class UTable {
         if (!this.table || !(this.table instanceof HTMLTableElement)) {
             throw new Error('Element not found');
         }
-        // Bind events
-        this._onResize = this._onResize.bind(this);
-        this._onScroll = this._onScroll.bind(this);
-        this._onScrollend = this._onScrollend.bind(this);
-        this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
-        this._onClickButtonRight = this._onClickButtonRight.bind(this);
+        this._bindEvents();
         this.render();
     }
     get el() {
@@ -193,6 +188,17 @@ export class UTable {
         return this;
     }
     /**
+     * Bind events
+     * @private
+     */
+    _bindEvents() {
+        this._onResize = this._onResize.bind(this);
+        this._onScroll = this._onScroll.bind(this);
+        this._onScrollend = this._onScrollend.bind(this);
+        this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
+        this._onClickButtonRight = this._onClickButtonRight.bind(this);
+    }
+    /**
      * Create button
      * @param {string} className - Button class name
      * @param {string} text - Button text
@@ -232,9 +238,11 @@ export class UTable {
      */
     _createShadowTable() {
         this.shadowTable = this.table.cloneNode(true);
-        this.shadowTable.style.visibility = 'hidden';
-        this.shadowTable.style.position = 'absolute';
-        this.shadowTable.style.zIndex = '-2147483640';
+        setStyles(this.shadowTable, {
+            visibility: 'hidden',
+            position: 'absolute',
+            zIndex: '-2147483640',
+        });
     }
     /**
      * Check if table is scrollable
@@ -245,16 +253,8 @@ export class UTable {
         const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
         const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
         this.isScrollable = isScrollLeft || isScrollRight;
-        // Toggle overlays
-        if (this.options.overlays) {
-            this.overlayLeft.forEach((el) => this._toggleOverlay(el, isScrollLeft));
-            this.overlayRight.forEach((el) => this._toggleOverlay(el, isScrollRight));
-        }
-        // Toggle buttons
-        if (this.options.buttons) {
-            this._toggleButton(this.buttonRight, isScrollRight);
-            this._toggleButton(this.buttonLeft, isScrollLeft);
-        }
+        this._toggleOverlays(isScrollLeft, isScrollRight);
+        this._toggleButtons(isScrollLeft, isScrollRight);
         // Sync scroll position
         if (this.scrollerHead)
             this.scrollerHead.scrollLeft = scrollLeft;
@@ -304,8 +304,10 @@ export class UTable {
         const offset = (parseInt(marginLeft, 10) || 0) + (parseInt(marginRight, 10) || 0); // Remove table margin from width
         const _th = Array.from(this.shadowTable.querySelectorAll('thead > tr > *'));
         const _td = Array.from(this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *'));
-        this.shadowTable.style.tableLayout = 'auto';
-        this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
+        setStyles(this.shadowTable, {
+            width: 'auto',
+            tableLayout: 'auto',
+        });
         // Fixed width
         if (this.options.width === 'fixed') {
             // Get first row and calculate column count
@@ -313,7 +315,7 @@ export class UTable {
                 []));
             const columnCount = tr.reduce((acc, el) => acc + (el.colSpan || 1), 0);
             // Set equal column width
-            tr.forEach((el) => (el.style.width = `${(100 / columnCount) * (el.colSpan || 1)}%`));
+            tr.forEach((el) => setStyles(el, { width: `${(100 / columnCount) * (el.colSpan || 1)}%` }));
             // Get max cell width
             const max = [..._th, ..._td]
                 .filter((el) => el.colSpan === 1)
@@ -322,7 +324,7 @@ export class UTable {
                 return width > acc ? width : acc;
             }, 0);
             // Update shadow table width depending on max cell width
-            this.shadowTable.style.width = `${max * columnCount}px`;
+            setStyles(this.shadowTable, { width: `${max * columnCount + offset}px` });
         }
         // Get cell widths
         const _thWidths = _th.map((el) => el.getBoundingClientRect().width);
@@ -340,53 +342,77 @@ export class UTable {
      * @private
      */
     _setWidth(el, width) {
-        (Array.isArray(el) ? el : [el]).forEach((el) => {
-            el.style.width = width ? `${width}px` : '';
-            el.style.minWidth = width ? `${width}px` : '';
-        });
+        const _width = width ? `${width}${isNaN(+width) ? '' : 'px'}` : '';
+        setStyles(el, { width: _width, minWidth: _width });
     }
     /**
      * Toggle button visibility
      * @param {HTMLButtonElement} el - Button element
      * @param {boolean} isActive - Is active
+     * @private
      */
     _toggleButton(el, isActive) {
         el.disabled = !isActive;
-        el.style.display = this.isScrollable ? '' : 'none';
+        setStyles(el, { display: this.isScrollable ? '' : 'none' });
+    }
+    /**
+     * Toggle buttons visibility
+     * @param {boolean} isScrollLeft - Is scroll left
+     * @param {boolean} isScrollRight - Is scroll right
+     * @private
+     */
+    _toggleButtons(isScrollLeft, isScrollRight) {
+        if (!this.options.buttons)
+            return;
+        this._toggleButton(this.buttonRight, isScrollRight);
+        this._toggleButton(this.buttonLeft, isScrollLeft);
     }
     /**
      * Toggle overlay visibility
-     * @param {HTMLElement} el - Overlay element
+     * @param {HTMLDivElement} el - Overlay element
      * @param {boolean} isActive - Is active
      * @private
      */
     _toggleOverlay(el, isActive) {
-        el.style.opacity = !isActive ? '0' : '1';
-        // Don't overlay scrollbar
-        if (el.parentElement === this.trackBody)
-            el.style.height = `${this.tableBodyHeight}px`;
+        const isBody = el.parentElement === this.trackBody;
+        setStyles(el, {
+            opacity: isActive ? '1' : '0',
+            height: isBody ? `${this.tableBodyHeight}px` : '', // Don't overlay scrollbar
+        });
+    }
+    /**
+     * Toggle overlays visibility
+     * @param isScrollLeft - Is scroll left
+     * @param isScrollRight - Is scroll right
+     * @private
+     */
+    _toggleOverlays(isScrollLeft, isScrollRight) {
+        if (!this.options.overlays)
+            return;
+        this.overlayLeft.forEach((el) => this._toggleOverlay(el, isScrollLeft));
+        this.overlayRight.forEach((el) => this._toggleOverlay(el, isScrollRight));
     }
     /**
      * Button left click event
      * @private
      */
     _onClickButtonLeft(e) {
-        const { onClickButtonLeft } = this.options;
+        var _a, _b;
         const { clientWidth, scrollLeft } = this.scrollerBody;
         this._scrollTo(scrollLeft - clientWidth * 0.75);
         this._isScrollable();
-        typeof onClickButtonLeft === 'function' && onClickButtonLeft(e);
+        (_b = (_a = this.options).onClickButtonLeft) === null || _b === void 0 ? void 0 : _b.call(_a, e);
     }
     /**
      * Button right click event
      * @private
      */
     _onClickButtonRight(e) {
-        const { onClickButtonRight } = this.options;
+        var _a, _b;
         const { clientWidth, scrollLeft } = this.scrollerBody;
         this._scrollTo(scrollLeft + clientWidth * 0.75);
         this._isScrollable();
-        typeof onClickButtonRight === 'function' && onClickButtonRight(e);
+        (_b = (_a = this.options).onClickButtonRight) === null || _b === void 0 ? void 0 : _b.call(_a, e);
     }
     /**
      * Resize event
@@ -400,12 +426,16 @@ export class UTable {
      * @private
      */
     _onScroll(e) {
-        const { onScroll } = this.options;
+        var _a, _b;
         this._isScrollable();
-        typeof onScroll === 'function' && onScroll(e);
+        (_b = (_a = this.options).onScroll) === null || _b === void 0 ? void 0 : _b.call(_a, e);
     }
+    /**
+     * Scrollend event
+     * @private
+     */
     _onScrollend(e) {
-        const { onScrollend } = this.options;
-        typeof onScrollend === 'function' && onScrollend(e);
+        var _a, _b;
+        (_b = (_a = this.options).onScrollend) === null || _b === void 0 ? void 0 : _b.call(_a, e);
     }
 }

@@ -1,6 +1,6 @@
 import { UTableDefaults } from './defaults';
 import { IUTable, IUTableOptions } from './types';
-import { createElement } from './utils';
+import { createElement, setStyles } from './utils';
 
 export class UTable implements IUTable {
 	isScrollable: boolean;
@@ -40,13 +40,7 @@ export class UTable implements IUTable {
 			throw new Error('Element not found');
 		}
 
-		// Bind events
-		this._onResize = this._onResize.bind(this);
-		this._onScroll = this._onScroll.bind(this);
-		this._onScrollend = this._onScrollend.bind(this);
-		this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
-		this._onClickButtonRight = this._onClickButtonRight.bind(this);
-
+		this._bindEvents();
 		this.render();
 	}
 
@@ -257,6 +251,18 @@ export class UTable implements IUTable {
 	}
 
 	/**
+	 * Bind events
+	 * @private
+	 */
+	_bindEvents() {
+		this._onResize = this._onResize.bind(this);
+		this._onScroll = this._onScroll.bind(this);
+		this._onScrollend = this._onScrollend.bind(this);
+		this._onClickButtonLeft = this._onClickButtonLeft.bind(this);
+		this._onClickButtonRight = this._onClickButtonRight.bind(this);
+	}
+
+	/**
 	 * Create button
 	 * @param {string} className - Button class name
 	 * @param {string} text - Button text
@@ -303,9 +309,11 @@ export class UTable implements IUTable {
 	 */
 	_createShadowTable() {
 		this.shadowTable = this.table.cloneNode(true) as HTMLTableElement;
-		this.shadowTable.style.visibility = 'hidden';
-		this.shadowTable.style.position = 'absolute';
-		this.shadowTable.style.zIndex = '-2147483640';
+		setStyles(this.shadowTable, {
+			visibility: 'hidden',
+			position: 'absolute',
+			zIndex: '-2147483640',
+		});
 	}
 
 	/**
@@ -317,18 +325,8 @@ export class UTable implements IUTable {
 		const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
 		const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
 		this.isScrollable = isScrollLeft || isScrollRight;
-
-		// Toggle overlays
-		if (this.options.overlays) {
-			this.overlayLeft.forEach((el) => this._toggleOverlay(el, isScrollLeft));
-			this.overlayRight.forEach((el) => this._toggleOverlay(el, isScrollRight));
-		}
-
-		// Toggle buttons
-		if (this.options.buttons) {
-			this._toggleButton(this.buttonRight, isScrollRight);
-			this._toggleButton(this.buttonLeft, isScrollLeft);
-		}
+		this._toggleOverlays(isScrollLeft, isScrollRight);
+		this._toggleButtons(isScrollLeft, isScrollRight);
 
 		// Sync scroll position
 		if (this.scrollerHead) this.scrollerHead.scrollLeft = scrollLeft;
@@ -390,8 +388,10 @@ export class UTable implements IUTable {
 		const _td = Array.from(
 			this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')
 		) as HTMLTableCellElement[];
-		this.shadowTable.style.tableLayout = 'auto';
-		this.shadowTable.style.width = `${this.el.clientWidth - offset}px`;
+		setStyles(this.shadowTable, {
+			width: 'auto',
+			tableLayout: 'auto',
+		});
 
 		// Fixed width
 		if (this.options.width === 'fixed') {
@@ -402,8 +402,8 @@ export class UTable implements IUTable {
 			);
 			const columnCount = tr.reduce((acc, el) => acc + (el.colSpan || 1), 0);
 			// Set equal column width
-			tr.forEach(
-				(el) => (el.style.width = `${(100 / columnCount) * (el.colSpan || 1)}%`)
+			tr.forEach((el) =>
+				setStyles(el, { width: `${(100 / columnCount) * (el.colSpan || 1)}%` })
 			);
 			// Get max cell width
 			const max = [..._th, ..._td]
@@ -413,7 +413,7 @@ export class UTable implements IUTable {
 					return width > acc ? width : acc;
 				}, 0);
 			// Update shadow table width depending on max cell width
-			this.shadowTable.style.width = `${max * columnCount}px`;
+			setStyles(this.shadowTable, { width: `${max * columnCount + offset}px` });
 		}
 
 		// Get cell widths
@@ -435,33 +435,57 @@ export class UTable implements IUTable {
 	 * @private
 	 */
 	_setWidth(el: HTMLElement | HTMLElement[], width?: number | string) {
-		(Array.isArray(el) ? el : [el]).forEach((el) => {
-			el.style.width = width ? `${width}px` : '';
-			el.style.minWidth = width ? `${width}px` : '';
-		});
+		const _width = width ? `${width}${isNaN(+width) ? '' : 'px'}` : '';
+		setStyles(el, { width: _width, minWidth: _width });
 	}
 
 	/**
 	 * Toggle button visibility
 	 * @param {HTMLButtonElement} el - Button element
 	 * @param {boolean} isActive - Is active
+	 * @private
 	 */
 	_toggleButton(el: HTMLButtonElement, isActive: boolean) {
 		el.disabled = !isActive;
-		el.style.display = this.isScrollable ? '' : 'none';
+		setStyles(el, { display: this.isScrollable ? '' : 'none' });
+	}
+
+	/**
+	 * Toggle buttons visibility
+	 * @param {boolean} isScrollLeft - Is scroll left
+	 * @param {boolean} isScrollRight - Is scroll right
+	 * @private
+	 */
+	_toggleButtons(isScrollLeft: boolean, isScrollRight: boolean) {
+		if (!this.options.buttons) return;
+		this._toggleButton(this.buttonRight, isScrollRight);
+		this._toggleButton(this.buttonLeft, isScrollLeft);
 	}
 
 	/**
 	 * Toggle overlay visibility
-	 * @param {HTMLElement} el - Overlay element
+	 * @param {HTMLDivElement} el - Overlay element
 	 * @param {boolean} isActive - Is active
 	 * @private
 	 */
-	_toggleOverlay(el: HTMLElement, isActive: boolean) {
-		el.style.opacity = !isActive ? '0' : '1';
-		// Don't overlay scrollbar
-		if (el.parentElement === this.trackBody)
-			el.style.height = `${this.tableBodyHeight}px`;
+	_toggleOverlay(el: HTMLDivElement, isActive: boolean) {
+		const isBody = el.parentElement === this.trackBody;
+		setStyles(el, {
+			opacity: isActive ? '1' : '0',
+			height: isBody ? `${this.tableBodyHeight}px` : '', // Don't overlay scrollbar
+		});
+	}
+
+	/**
+	 * Toggle overlays visibility
+	 * @param isScrollLeft - Is scroll left
+	 * @param isScrollRight - Is scroll right
+	 * @private
+	 */
+	_toggleOverlays(isScrollLeft: boolean, isScrollRight: boolean) {
+		if (!this.options.overlays) return;
+		this.overlayLeft.forEach((el) => this._toggleOverlay(el, isScrollLeft));
+		this.overlayRight.forEach((el) => this._toggleOverlay(el, isScrollRight));
 	}
 
 	/**
@@ -469,11 +493,10 @@ export class UTable implements IUTable {
 	 * @private
 	 */
 	_onClickButtonLeft(e: Event) {
-		const { onClickButtonLeft } = this.options;
 		const { clientWidth, scrollLeft } = this.scrollerBody;
 		this._scrollTo(scrollLeft - clientWidth * 0.75);
 		this._isScrollable();
-		typeof onClickButtonLeft === 'function' && onClickButtonLeft(e);
+		this.options.onClickButtonLeft?.(e);
 	}
 
 	/**
@@ -481,11 +504,10 @@ export class UTable implements IUTable {
 	 * @private
 	 */
 	_onClickButtonRight(e: Event) {
-		const { onClickButtonRight } = this.options;
 		const { clientWidth, scrollLeft } = this.scrollerBody;
 		this._scrollTo(scrollLeft + clientWidth * 0.75);
 		this._isScrollable();
-		typeof onClickButtonRight === 'function' && onClickButtonRight(e);
+		this.options.onClickButtonRight?.(e);
 	}
 
 	/**
@@ -501,13 +523,15 @@ export class UTable implements IUTable {
 	 * @private
 	 */
 	_onScroll(e: Event) {
-		const { onScroll } = this.options;
 		this._isScrollable();
-		typeof onScroll === 'function' && onScroll(e);
+		this.options.onScroll?.(e);
 	}
 
+	/**
+	 * Scrollend event
+	 * @private
+	 */
 	_onScrollend(e: Event) {
-		const { onScrollend } = this.options;
-		typeof onScrollend === 'function' && onScrollend(e);
+		this.options.onScrollend?.(e);
 	}
 }
