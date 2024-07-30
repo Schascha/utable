@@ -33,14 +33,15 @@ export interface IUTableOptions {
     overlays: boolean;
     sticky: boolean;
     width: 'auto' | 'fixed';
+    classBody: string;
     classButtonLeft: string;
     classButtonRight: string;
+    classHead: string;
     classOverlayLeft: string;
     classOverlayRight: string;
     classScroller: string;
     classSticky: string;
     classTop: string;
-    classTrack: string;
     classWrapper: string;
     textButtonLeft: string;
     textButtonRight: string;

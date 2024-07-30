@@ -118,7 +118,7 @@ export class UTable {
     get trackBody() {
         if (!this._.trackBody) {
             this._.trackBody = createElement('div', {
-                className: `${this.options.classTrack} tbody`,
+                className: `${this.options.classBody}`,
             });
             this._.trackBody.appendChild(this.scrollerBody);
         }
@@ -127,7 +127,7 @@ export class UTable {
     get trackHead() {
         if (!this._.trackHead && this.scrollerHead) {
             this._.trackHead = createElement('div', {
-                className: `${this.options.classTrack} thead`,
+                className: `${this.options.classHead}`,
             });
             this._.trackHead.appendChild(this.scrollerHead);
             this.el.appendChild(this._.trackHead);

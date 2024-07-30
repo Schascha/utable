@@ -9,13 +9,14 @@
         overlays: true,
         sticky: true,
         width: 'auto',
+        classBody: 'tbody',
         classButtonLeft: 'button-left',
         classButtonRight: 'button-right',
+        classHead: 'thead',
         classOverlayLeft: 'scroll-left',
         classOverlayRight: 'scroll-right',
         classScroller: 'scroller',
         classSticky: 'is-sticky',
-        classTrack: 'track',
         classTop: 'top',
         classWrapper: 'utable',
         textButtonLeft: 'Left',
@@ -162,7 +163,7 @@
         get trackBody() {
             if (!this._.trackBody) {
                 this._.trackBody = createElement('div', {
-                    className: `${this.options.classTrack} tbody`,
+                    className: `${this.options.classBody}`,
                 });
                 this._.trackBody.appendChild(this.scrollerBody);
             }
@@ -171,7 +172,7 @@
         get trackHead() {
             if (!this._.trackHead && this.scrollerHead) {
                 this._.trackHead = createElement('div', {
-                    className: `${this.options.classTrack} thead`,
+                    className: `${this.options.classHead}`,
                 });
                 this._.trackHead.appendChild(this.scrollerHead);
                 this.el.appendChild(this._.trackHead);

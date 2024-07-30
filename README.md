@@ -29,14 +29,15 @@ const table = new UTable('table', {
 | `overlays`           | boolean  | `true`         | Enable or disable overlays              |
 | `sticky`             | boolean  | `true`         | Enable or disable sticky observer       |
 | `width`              | string   | `auto`         | Width of the table, auto or fixed       |
+| `classBody`          | string   | `tbody`        | Class name for body element             |
 | `classButtonLeft`    | string   | `button-left`  | Class name for left button              |
 | `classButtonRight`   | string   | `button-right` | Class name for right button             |
+| `classHead`          | string   | `tbody`        | Class name for head element             |
 | `classOverlayLeft`   | string   | `scroll-left`  | Class name for left overlay             |
 | `classOverlayRight`  | string   | `scroll-right` | Class name for right overlay            |
 | `classScroller`      | string   | `scroller`     | Class name for scroller                 |
 | `classSticky`        | string   | `is-sticky`    | Class name if table header is sticky    |
 | `classTop`           | string   | `top`          | Class name for top element              |
-| `classTrack`         | string   | `track`        | Class name for track element            |
 | `classWrapper`       | string   | `utable`       | Class name for wrapper element          |
 | `textButtonLeft`     | string   | `Left`         | Text for left button                    |
 | `textButtonRight`    | string   | `Right`        | Text for right button                   |
