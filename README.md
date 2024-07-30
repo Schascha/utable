@@ -1,6 +1,7 @@
 # uTable
 
 [![Build](https://github.com/Schascha/utable/actions/workflows/build.yml/badge.svg)](https://github.com/Schascha/utable/actions)
+[![npm](https://img.shields.io/npm/v/@schascha/utable)](https://www.npmjs.com/package/@schascha/utable)
 
 > Just a responsive table plugin
 
