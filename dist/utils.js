@@ -9,11 +9,13 @@
  */
 export function createElement(tag, options = {}) {
     const el = document.createElement(tag);
-    const { className, insertMethod, parent } = options;
+    const { children, className, insertMethod, parent } = options;
     if (className)
         el.className = className;
     if (parent)
         parent[insertMethod || 'append'](el);
+    if (children)
+        children.forEach((child) => el.appendChild(child));
     return el;
 }
 /**

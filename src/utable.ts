@@ -1,28 +1,14 @@
+import { getCache, setCache } from './cache';
 import { UTableDefaults } from './defaults';
-import { IUTable, IUTableOptions } from './types';
+import type { IUTable, IUTableOptions, IUTableCache } from './types';
 import { createElement, setStyles } from './utils';
 
 export class UTable implements IUTable {
-	isScrollable: boolean;
+	isScrollable: boolean = false;
 	observer?: IntersectionObserver;
 	options: IUTableOptions;
 	shadowTable?: HTMLTableElement;
 	table: HTMLTableElement;
-
-	private _: {
-		buttonLeft?: HTMLButtonElement;
-		buttonRight?: HTMLButtonElement;
-		el?: HTMLDivElement;
-		overlayLeft?: HTMLDivElement[];
-		overlayRight?: HTMLDivElement[];
-		scrollerBody?: HTMLDivElement;
-		scrollerHead?: HTMLDivElement;
-		tableBody?: HTMLTableElement;
-		tableHead?: HTMLTableElement | null;
-		top?: HTMLDivElement;
-		trackBody?: HTMLDivElement;
-		trackHead?: HTMLDivElement;
-	};
 
 	constructor(
 		table: HTMLTableElement | string,
@@ -32,113 +18,116 @@ export class UTable implements IUTable {
 			typeof table === 'string' ? document.querySelector(table) : table
 		) as HTMLTableElement;
 		this.options = { ...UTableDefaults, ...options };
-		this._ = {};
-		this.isScrollable = false;
 
 		// Check if table exists
 		if (!this.table || !(this.table instanceof HTMLTableElement)) {
 			throw new Error('Element not found');
 		}
 
+		setCache(this, {});
 		this._bindEvents();
 		this.render();
 	}
 
 	get el(): HTMLDivElement {
-		if (!this._.el) {
-			this._.el = createElement('div', {
+		const _ = getCache(this);
+		if (!_.el) {
+			_.el = createElement('div', {
 				className: this.options.classWrapper,
 				insertMethod: 'before',
 				parent: this.table,
+				children: [this.table],
 			});
-			this._.el.appendChild(this.table);
 		}
-		return this._.el;
+		return _.el;
 	}
 
 	get buttonLeft(): HTMLButtonElement {
-		if (!this._.buttonLeft) {
-			const { classButtonLeft, textButtonLeft, titleButtonLeft } = this.options;
-			this._.buttonLeft = this._createButton(
-				classButtonLeft,
-				textButtonLeft,
-				titleButtonLeft,
+		const _ = getCache(this);
+		if (!_.buttonLeft) {
+			_.buttonLeft = this._createButton(
+				this.options.classButtonLeft,
+				this.options.textButtonLeft,
+				this.options.titleButtonLeft,
 				this._onClickButtonLeft
 			);
 		}
-		return this._.buttonLeft;
+		return _.buttonLeft;
 	}
 
 	get buttonRight(): HTMLButtonElement {
-		if (!this._.buttonRight) {
-			const { classButtonRight, textButtonRight, titleButtonRight } =
-				this.options;
-			this._.buttonRight = this._createButton(
-				classButtonRight,
-				textButtonRight,
-				titleButtonRight,
+		const _ = getCache(this);
+		if (!_.buttonRight) {
+			_.buttonRight = this._createButton(
+				this.options.classButtonRight,
+				this.options.textButtonRight,
+				this.options.titleButtonRight,
 				this._onClickButtonRight
 			);
 		}
-		return this._.buttonRight;
+		return _.buttonRight;
 	}
 
 	get scrollerHead(): HTMLDivElement | undefined {
-		if (!this._.scrollerHead && this.tableHead) {
-			this._.scrollerHead = createElement('div', {
+		const _ = getCache(this);
+		if (!_.scrollerHead && this.tableHead) {
+			_.scrollerHead = createElement('div', {
 				className: this.options.classScroller,
+				children: [this.tableHead],
 			});
-			this._.scrollerHead.appendChild(this.tableHead);
 		}
-		return this._.scrollerHead;
+		return _.scrollerHead;
 	}
 
 	get scrollerBody(): HTMLDivElement {
-		if (!this._.scrollerBody) {
+		const _ = getCache(this);
+		if (!_.scrollerBody) {
 			const { classScroller, onScrollend } = this.options;
-			const el = createElement('div', { className: classScroller });
-			el.appendChild(this.tableBody);
+			const el = createElement('div', {
+				className: classScroller,
+				children: [this.tableBody],
+			});
 			el.addEventListener('scroll', this._onScroll);
-			onScrollend && el.addEventListener('scrollend', this._onScrollend);
 			el.setAttribute('tabindex', '0');
-			this._.scrollerBody = el;
+			onScrollend && el.addEventListener('scrollend', this._onScrollend);
+			_.scrollerBody = el;
 		}
-		return this._.scrollerBody;
+		return _.scrollerBody;
 	}
 
 	get overlayLeft(): HTMLDivElement[] {
-		this._.overlayLeft =
-			this._.overlayLeft || this._createOverlay(this.options.classOverlayLeft);
-		return this._.overlayLeft;
+		const _ = getCache(this);
+		_.overlayLeft =
+			_.overlayLeft ?? this._createOverlay(this.options.classOverlayLeft);
+		return _.overlayLeft;
 	}
 
 	get overlayRight(): HTMLDivElement[] {
-		this._.overlayRight =
-			this._.overlayRight ||
-			this._createOverlay(this.options.classOverlayRight);
-		return this._.overlayRight;
+		const _ = getCache(this);
+		_.overlayRight =
+			_.overlayRight ?? this._createOverlay(this.options.classOverlayRight);
+		return _.overlayRight;
 	}
 
 	get tableBody(): HTMLTableElement {
-		this._.tableBody = this._.tableBody || this.table;
-		return this._.tableBody;
+		const _ = getCache(this);
+		_.tableBody = _.tableBody ?? this.table;
+		return _.tableBody;
 	}
 
 	get tableBodyHeight(): number {
-		return this.tableBody?.offsetHeight || 0;
+		return this.tableBody?.offsetHeight ?? 0;
 	}
 
 	get tableHead(): HTMLTableElement | null {
-		if (typeof this._.tableHead === 'undefined') {
+		const _ = getCache(this);
+		if (typeof _.tableHead === 'undefined') {
 			const thead = this.el?.querySelector('thead');
-			if (thead) {
-				this._.tableHead = createElement('table');
-				this._.tableHead.appendChild(thead);
-			} else {
-				this._.tableHead = thead;
-			}
+			_.tableHead = thead
+				? createElement('table', { children: [thead] })
+				: null;
 		}
-		return this._.tableHead;
+		return _.tableHead;
 	}
 
 	get td(): HTMLTableCellElement[] {
@@ -152,35 +141,38 @@ export class UTable implements IUTable {
 	}
 
 	get top(): HTMLDivElement {
-		if (!this._.top) {
-			this._.top = createElement('div', {
+		const _ = getCache(this);
+		if (!_.top) {
+			_.top = createElement('div', {
 				className: this.options.classTop,
 				parent: this.el,
 				insertMethod: 'prepend',
 			});
 		}
-		return this._.top;
+		return _.top;
 	}
 
 	get trackBody(): HTMLDivElement {
-		if (!this._.trackBody) {
-			this._.trackBody = createElement('div', {
+		const _ = getCache(this);
+		if (!_.trackBody) {
+			_.trackBody = createElement('div', {
 				className: `${this.options.classBody}`,
+				children: [this.scrollerBody],
 			});
-			this._.trackBody.appendChild(this.scrollerBody);
 		}
-		return this._.trackBody;
+		return _.trackBody;
 	}
 
 	get trackHead(): HTMLDivElement | undefined {
-		if (!this._.trackHead && this.scrollerHead) {
-			this._.trackHead = createElement('div', {
+		const _ = getCache(this);
+		if (!_.trackHead && this.scrollerHead) {
+			_.trackHead = createElement('div', {
 				className: `${this.options.classHead}`,
+				children: [this.scrollerHead],
 			});
-			this._.trackHead.appendChild(this.scrollerHead);
-			this.el.appendChild(this._.trackHead);
+			this.el.appendChild(_.trackHead);
 		}
-		return this._.trackHead;
+		return _.trackHead;
 	}
 
 	destroy() {
@@ -200,8 +192,8 @@ export class UTable implements IUTable {
 		this.el?.parentNode?.replaceChild(this.table, this.el);
 		this.top?.parentNode?.removeChild(this.top);
 
-		// Remove private properties
-		this._ = {};
+		// Empty cache
+		setCache(this, {});
 	}
 
 	/**
@@ -230,23 +222,24 @@ export class UTable implements IUTable {
 		// Resize event
 		window.addEventListener('resize', this._onResize);
 		window.addEventListener('orientationchange', this._onResize);
+
 		return this.update();
 	}
 
 	/**
 	 * Update method
 	 * This method should be called when the table is updated
+	 * Falls back to render method if no cache is found
 	 * @returns {this} - Table instance
 	 */
 	update(): this {
-		// Fall back to render method
-		if (!Object.keys(this._).length) {
+		const _ = getCache(this);
+		if (!Object.keys(_).length) {
 			return this.render();
 		}
-		const { onUpdate } = this.options;
 		this._setEqualWidth();
 		this._isScrollable();
-		typeof onUpdate === 'function' && onUpdate();
+		this.options.onUpdate?.();
 		return this;
 	}
 
@@ -317,7 +310,7 @@ export class UTable implements IUTable {
 	}
 
 	/**
-	 * Check if table is scrollable
+	 * Check if the table is scrollable and toggle the visibility of the buttons and overlays
 	 * @private
 	 */
 	_isScrollable() {
@@ -325,6 +318,8 @@ export class UTable implements IUTable {
 		const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
 		const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
 		this.isScrollable = isScrollLeft || isScrollRight;
+
+		// Toggle visibility
 		this._toggleOverlays(isScrollLeft, isScrollRight);
 		this._toggleButtons(isScrollLeft, isScrollRight);
 

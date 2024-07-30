@@ -314,52 +314,15 @@
 
 	<script src="utable.js"></script>
 	<script>
-		const uTable = window.UTable.UTable; // Module is namespaced in UMD build
-		const tables = Array.from(document.querySelectorAll('table')).map((el) => ({
-			el,
-			table: new uTable(el, {
-				onClickButtonLeft: (e) => {
-					console.log('Left button clicked', e);
-				},
-				onClickButtonRight: (e) => {
-					console.log('Right button clicked', e);
-				},
-				onScrollend: (e) => {
-					console.log('Scrolled', e);
-				},
-			}),
-		}));
-
-		const options = {};
-
-		function update() {
-			tables.forEach(({ el, table }) => {
-				el.dataset.options = JSON.stringify(options);
-				table.destroy();
-				table.render();
-			});
-		}
-
+		// Form
 		const buttons = document.getElementById('buttons');
-		buttons.addEventListener('change', (e) => {
-			options.buttons = e.target.checked;
-			update();
-		});
-
 		const overlays = document.getElementById('overlays');
-		overlays.addEventListener('change', (e) => {
-			options.overlays = e.target.checked;
-			update();
-		});
-
 		const width = document.getElementById('width');
-		width.addEventListener('change', (e) => {
-			options.width = e.target.checked ? 'fixed' : 'auto';
-			update();
-		});
-
 		const styleButton = document.getElementById('style');
 		const code = document.getElementById('code');
+
+		// Styles
+		const options = {};
 		const styles = [
 			`.thead table {
 	background-color: #f5c95e;
@@ -395,6 +358,33 @@ td {
 }`,
 		];
 		let activeStyle = styles[0];
+		styleChange();
+
+		// UTable
+		const uTable = window.UTable.UTable; // Module is namespaced in UMD build
+		const tables = Array.from(document.querySelectorAll('table')).map((el) => ({
+			el,
+			table: new uTable(el, {
+				onClickButtonLeft: (e) => {
+					console.log('Left button clicked', e);
+				},
+				onClickButtonRight: (e) => {
+					console.log('Right button clicked', e);
+				},
+				onScrollend: (e) => {
+					console.log('Scrolled', e);
+				},
+			}),
+		}));
+
+		// Events
+		function update() {
+			tables.forEach(({ el, table }) => {
+				el.dataset.options = JSON.stringify(options);
+				table.destroy();
+				table.render();
+			});
+		}
 
 		function styleChange(style = activeStyle) {
 			let styleEl = document.getElementById('dynamicStyle');
@@ -406,13 +396,27 @@ td {
 			styleEl.textContent = style;
 			code.textContent = style;
 			activeStyle = style;
-			update();
 		}
 
-		styleChange();
+		buttons.addEventListener('change', (e) => {
+			options.buttons = e.target.checked;
+			update();
+		});
+
+		overlays.addEventListener('change', (e) => {
+			options.overlays = e.target.checked;
+			update();
+		});
+
+		width.addEventListener('change', (e) => {
+			options.width = e.target.checked ? 'fixed' : 'auto';
+			update();
+		});
+
 		styleButton.addEventListener('click', () => {
 			const _styles = styles.filter((style) => style !== activeStyle);
 			styleChange(_styles[Math.floor(Math.random() * _styles.length)]);
+			update();
 		});
 	</script>
 </html>

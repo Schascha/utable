@@ -11,6 +11,7 @@ export declare function createElement<K extends keyof HTMLElementTagNameMap>(tag
     className?: string;
     insertMethod?: 'prepend' | 'append' | 'before' | 'after';
     parent?: Element;
+    children?: HTMLElement[];
 }): HTMLElementTagNameMap[K];
 /**
  * Set styles to elements

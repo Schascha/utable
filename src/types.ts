@@ -4,6 +4,21 @@ export interface IUTable {
 	update(): void;
 }
 
+export interface IUTableCache {
+	buttonLeft?: HTMLButtonElement;
+	buttonRight?: HTMLButtonElement;
+	el?: HTMLDivElement;
+	overlayLeft?: HTMLDivElement[];
+	overlayRight?: HTMLDivElement[];
+	scrollerBody?: HTMLDivElement;
+	scrollerHead?: HTMLDivElement;
+	tableBody?: HTMLTableElement;
+	tableHead?: HTMLTableElement | null;
+	top?: HTMLDivElement;
+	trackBody?: HTMLDivElement;
+	trackHead?: HTMLDivElement;
+}
+
 /**
  * Options for UTable
  * @props {boolean} buttons - Enable or disable buttons

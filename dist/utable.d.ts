@@ -1,11 +1,10 @@
-import { IUTable, IUTableOptions } from './types';
+import type { IUTable, IUTableOptions } from './types';
 export declare class UTable implements IUTable {
     isScrollable: boolean;
     observer?: IntersectionObserver;
     options: IUTableOptions;
     shadowTable?: HTMLTableElement;
     table: HTMLTableElement;
-    private _;
     constructor(table: HTMLTableElement | string, options?: Partial<IUTableOptions>);
     get el(): HTMLDivElement;
     get buttonLeft(): HTMLButtonElement;
@@ -32,6 +31,7 @@ export declare class UTable implements IUTable {
     /**
      * Update method
      * This method should be called when the table is updated
+     * Falls back to render method if no cache is found
      * @returns {this} - Table instance
      */
     update(): this;
@@ -63,7 +63,7 @@ export declare class UTable implements IUTable {
      */
     _createShadowTable(): void;
     /**
-     * Check if table is scrollable
+     * Check if the table is scrollable and toggle the visibility of the buttons and overlays
      * @private
      */
     _isScrollable(): void;

@@ -13,12 +13,14 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 		className?: string;
 		insertMethod?: 'prepend' | 'append' | 'before' | 'after';
 		parent?: Element;
+		children?: HTMLElement[];
 	} = {}
 ): HTMLElementTagNameMap[K] {
 	const el = document.createElement(tag);
-	const { className, insertMethod, parent } = options;
+	const { children, className, insertMethod, parent } = options;
 	if (className) el.className = className;
 	if (parent) parent[insertMethod || 'append'](el);
+	if (children) children.forEach((child) => el.appendChild(child));
 	return el;
 }
 

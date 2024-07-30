@@ -1,96 +1,104 @@
+import { getCache, setCache } from './cache';
 import { UTableDefaults } from './defaults';
 import { createElement, setStyles } from './utils';
 export class UTable {
     constructor(table, options) {
+        this.isScrollable = false;
         this.table = (typeof table === 'string' ? document.querySelector(table) : table);
         this.options = Object.assign(Object.assign({}, UTableDefaults), options);
-        this._ = {};
-        this.isScrollable = false;
         // Check if table exists
         if (!this.table || !(this.table instanceof HTMLTableElement)) {
             throw new Error('Element not found');
         }
+        setCache(this, {});
         this._bindEvents();
         this.render();
     }
     get el() {
-        if (!this._.el) {
-            this._.el = createElement('div', {
+        const _ = getCache(this);
+        if (!_.el) {
+            _.el = createElement('div', {
                 className: this.options.classWrapper,
                 insertMethod: 'before',
                 parent: this.table,
+                children: [this.table],
             });
-            this._.el.appendChild(this.table);
         }
-        return this._.el;
+        return _.el;
     }
     get buttonLeft() {
-        if (!this._.buttonLeft) {
-            const { classButtonLeft, textButtonLeft, titleButtonLeft } = this.options;
-            this._.buttonLeft = this._createButton(classButtonLeft, textButtonLeft, titleButtonLeft, this._onClickButtonLeft);
+        const _ = getCache(this);
+        if (!_.buttonLeft) {
+            _.buttonLeft = this._createButton(this.options.classButtonLeft, this.options.textButtonLeft, this.options.titleButtonLeft, this._onClickButtonLeft);
         }
-        return this._.buttonLeft;
+        return _.buttonLeft;
     }
     get buttonRight() {
-        if (!this._.buttonRight) {
-            const { classButtonRight, textButtonRight, titleButtonRight } = this.options;
-            this._.buttonRight = this._createButton(classButtonRight, textButtonRight, titleButtonRight, this._onClickButtonRight);
+        const _ = getCache(this);
+        if (!_.buttonRight) {
+            _.buttonRight = this._createButton(this.options.classButtonRight, this.options.textButtonRight, this.options.titleButtonRight, this._onClickButtonRight);
         }
-        return this._.buttonRight;
+        return _.buttonRight;
     }
     get scrollerHead() {
-        if (!this._.scrollerHead && this.tableHead) {
-            this._.scrollerHead = createElement('div', {
+        const _ = getCache(this);
+        if (!_.scrollerHead && this.tableHead) {
+            _.scrollerHead = createElement('div', {
                 className: this.options.classScroller,
+                children: [this.tableHead],
             });
-            this._.scrollerHead.appendChild(this.tableHead);
         }
-        return this._.scrollerHead;
+        return _.scrollerHead;
     }
     get scrollerBody() {
-        if (!this._.scrollerBody) {
+        const _ = getCache(this);
+        if (!_.scrollerBody) {
             const { classScroller, onScrollend } = this.options;
-            const el = createElement('div', { className: classScroller });
-            el.appendChild(this.tableBody);
+            const el = createElement('div', {
+                className: classScroller,
+                children: [this.tableBody],
+            });
             el.addEventListener('scroll', this._onScroll);
-            onScrollend && el.addEventListener('scrollend', this._onScrollend);
             el.setAttribute('tabindex', '0');
-            this._.scrollerBody = el;
+            onScrollend && el.addEventListener('scrollend', this._onScrollend);
+            _.scrollerBody = el;
         }
-        return this._.scrollerBody;
+        return _.scrollerBody;
     }
     get overlayLeft() {
-        this._.overlayLeft =
-            this._.overlayLeft || this._createOverlay(this.options.classOverlayLeft);
-        return this._.overlayLeft;
+        var _a;
+        const _ = getCache(this);
+        _.overlayLeft =
+            (_a = _.overlayLeft) !== null && _a !== void 0 ? _a : this._createOverlay(this.options.classOverlayLeft);
+        return _.overlayLeft;
     }
     get overlayRight() {
-        this._.overlayRight =
-            this._.overlayRight ||
-                this._createOverlay(this.options.classOverlayRight);
-        return this._.overlayRight;
+        var _a;
+        const _ = getCache(this);
+        _.overlayRight =
+            (_a = _.overlayRight) !== null && _a !== void 0 ? _a : this._createOverlay(this.options.classOverlayRight);
+        return _.overlayRight;
     }
     get tableBody() {
-        this._.tableBody = this._.tableBody || this.table;
-        return this._.tableBody;
+        var _a;
+        const _ = getCache(this);
+        _.tableBody = (_a = _.tableBody) !== null && _a !== void 0 ? _a : this.table;
+        return _.tableBody;
     }
     get tableBodyHeight() {
-        var _a;
-        return ((_a = this.tableBody) === null || _a === void 0 ? void 0 : _a.offsetHeight) || 0;
+        var _a, _b;
+        return (_b = (_a = this.tableBody) === null || _a === void 0 ? void 0 : _a.offsetHeight) !== null && _b !== void 0 ? _b : 0;
     }
     get tableHead() {
         var _a;
-        if (typeof this._.tableHead === 'undefined') {
+        const _ = getCache(this);
+        if (typeof _.tableHead === 'undefined') {
             const thead = (_a = this.el) === null || _a === void 0 ? void 0 : _a.querySelector('thead');
-            if (thead) {
-                this._.tableHead = createElement('table');
-                this._.tableHead.appendChild(thead);
-            }
-            else {
-                this._.tableHead = thead;
-            }
+            _.tableHead = thead
+                ? createElement('table', { children: [thead] })
+                : null;
         }
-        return this._.tableHead;
+        return _.tableHead;
     }
     get td() {
         const { table } = this;
@@ -101,33 +109,36 @@ export class UTable {
         return tableHead ? Array.from(tableHead.querySelectorAll('tr > *')) : [];
     }
     get top() {
-        if (!this._.top) {
-            this._.top = createElement('div', {
+        const _ = getCache(this);
+        if (!_.top) {
+            _.top = createElement('div', {
                 className: this.options.classTop,
                 parent: this.el,
                 insertMethod: 'prepend',
             });
         }
-        return this._.top;
+        return _.top;
     }
     get trackBody() {
-        if (!this._.trackBody) {
-            this._.trackBody = createElement('div', {
+        const _ = getCache(this);
+        if (!_.trackBody) {
+            _.trackBody = createElement('div', {
                 className: `${this.options.classBody}`,
+                children: [this.scrollerBody],
             });
-            this._.trackBody.appendChild(this.scrollerBody);
         }
-        return this._.trackBody;
+        return _.trackBody;
     }
     get trackHead() {
-        if (!this._.trackHead && this.scrollerHead) {
-            this._.trackHead = createElement('div', {
+        const _ = getCache(this);
+        if (!_.trackHead && this.scrollerHead) {
+            _.trackHead = createElement('div', {
                 className: `${this.options.classHead}`,
+                children: [this.scrollerHead],
             });
-            this._.trackHead.appendChild(this.scrollerHead);
-            this.el.appendChild(this._.trackHead);
+            this.el.appendChild(_.trackHead);
         }
-        return this._.trackHead;
+        return _.trackHead;
     }
     destroy() {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
@@ -145,8 +156,8 @@ export class UTable {
         ((_f = this.tableHead) === null || _f === void 0 ? void 0 : _f.firstChild) && this.table.prepend(this.tableHead.firstChild);
         (_h = (_g = this.el) === null || _g === void 0 ? void 0 : _g.parentNode) === null || _h === void 0 ? void 0 : _h.replaceChild(this.table, this.el);
         (_k = (_j = this.top) === null || _j === void 0 ? void 0 : _j.parentNode) === null || _k === void 0 ? void 0 : _k.removeChild(this.top);
-        // Remove private properties
-        this._ = {};
+        // Empty cache
+        setCache(this, {});
     }
     /**
      * Render method
@@ -174,17 +185,18 @@ export class UTable {
     /**
      * Update method
      * This method should be called when the table is updated
+     * Falls back to render method if no cache is found
      * @returns {this} - Table instance
      */
     update() {
-        // Fall back to render method
-        if (!Object.keys(this._).length) {
+        var _a, _b;
+        const _ = getCache(this);
+        if (!Object.keys(_).length) {
             return this.render();
         }
-        const { onUpdate } = this.options;
         this._setEqualWidth();
         this._isScrollable();
-        typeof onUpdate === 'function' && onUpdate();
+        (_b = (_a = this.options).onUpdate) === null || _b === void 0 ? void 0 : _b.call(_a);
         return this;
     }
     /**
@@ -245,7 +257,7 @@ export class UTable {
         });
     }
     /**
-     * Check if table is scrollable
+     * Check if the table is scrollable and toggle the visibility of the buttons and overlays
      * @private
      */
     _isScrollable() {
@@ -253,6 +265,7 @@ export class UTable {
         const isScrollLeft = scrollLeft > 0 && clientWidth < scrollWidth;
         const isScrollRight = scrollLeft + clientWidth < scrollWidth - 1;
         this.isScrollable = isScrollLeft || isScrollRight;
+        // Toggle visibility
         this._toggleOverlays(isScrollLeft, isScrollRight);
         this._toggleButtons(isScrollLeft, isScrollRight);
         // Sync scroll position
