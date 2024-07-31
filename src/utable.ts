@@ -130,6 +130,11 @@ export class UTable implements IUTable {
 		return _.tableHead;
 	}
 
+	get tableMargin(): number {
+		const { marginLeft, marginRight } = window.getComputedStyle(this.table);
+		return (parseInt(marginLeft, 10) || 0) + (parseInt(marginRight, 10) || 0);
+	}
+
 	get td(): HTMLTableCellElement[] {
 		const { table } = this;
 		return Array.from(table.querySelectorAll('table > tr > *, tbody > tr > *'));
@@ -374,52 +379,54 @@ export class UTable implements IUTable {
 
 		// Append shadow table and calculate table width
 		this.el.prepend(this.shadowTable);
-		const { marginLeft, marginRight } = window.getComputedStyle(this.table);
-		const offset =
-			(parseInt(marginLeft, 10) || 0) + (parseInt(marginRight, 10) || 0); // Remove table margin from width
-		const _th = Array.from(
+		const th = Array.from(
 			this.shadowTable.querySelectorAll('thead > tr > *')
 		) as HTMLTableCellElement[];
-		const _td = Array.from(
+		const td = Array.from(
 			this.shadowTable.querySelectorAll('table > tr > *, tbody > tr > *')
 		) as HTMLTableCellElement[];
 		setStyles(this.shadowTable, {
 			tableLayout: 'auto',
-			width: `${this.el.clientWidth - offset}px`,
+			width: `${this.el.clientWidth - this.tableMargin}px`,
 		});
 
 		// Fixed width
 		if (this.options.width === 'fixed') {
-			// Get first row cells and calculate column count
+			// Get first row cells
 			const cells = Array.from(
 				(this.shadowTable.querySelector('tr')?.children ||
 					[]) as HTMLTableCellElement[]
 			);
-			const colums = cells.reduce((acc, el) => acc + (el.colSpan || 1), 0);
+
+			// Calculate column count
+			const columnCount = cells.reduce((acc, el) => acc + (el.colSpan || 1), 0);
+
 			// Set equal column width
 			cells.forEach((el) =>
-				setStyles(el, { width: `${(100 / colums) * (el.colSpan || 1)}%` })
+				setStyles(el, { width: `${(100 / columnCount) * (el.colSpan || 1)}%` })
 			);
+
 			// Get max cell width
-			const max = Math.max(
-				...[..._th, ..._td]
+			const maxCellWidth = Math.max(
+				...[...th, ...td]
 					.filter((el) => el.colSpan === 1)
 					.map((el) => el.getBoundingClientRect().width)
 			);
+
 			// Update shadow table width depending on max cell width
-			setStyles(this.shadowTable, { width: `${max * colums}px` });
+			setStyles(this.shadowTable, { width: `${maxCellWidth * columnCount}px` });
 		}
 
 		// Get cell widths
-		const _thWidths = _th.map((el) => el.getBoundingClientRect().width);
-		const _tdWidths = _td.map((el) => el.getBoundingClientRect().width);
+		const thWidths = th.map((el) => el.getBoundingClientRect().width);
+		const tdWidths = td.map((el) => el.getBoundingClientRect().width);
 
 		// Remove shadow table
 		this.el.removeChild(this.shadowTable);
 
 		// Set cell widths
-		this.th.forEach((el, index) => this._setWidth(el, _thWidths[index]));
-		this.td.forEach((el, index) => this._setWidth(el, _tdWidths[index]));
+		this.th.forEach((el, index) => this._setWidth(el, thWidths[index]));
+		this.td.forEach((el, index) => this._setWidth(el, tdWidths[index]));
 	}
 
 	/**
