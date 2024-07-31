@@ -313,6 +313,7 @@
 	</body>
 
 	<script src="utable.js"></script>
+	<script src="styles.js"></script>
 	<script>
 		// Form
 		const buttons = document.getElementById('buttons');
@@ -322,43 +323,8 @@
 		const code = document.getElementById('code');
 
 		// Styles
-		const options = {};
-		const styles = [
-			`.thead table {
-	background-color: #f5c95e;
-	border-radius: 6px 6px 0 0 ;
-}
-
-.tbody tr:nth-of-type(odd) {
-	background-color: #f8f8f9;
-}`,
-			`.thead table {
-	background-color: #e5f2ff;
-	border-radius: 6px 6px 0 0 ;
-}
-
-.tbody td {
-	border-bottom: 1px solid #e0e0e0;
-}`,
-			`.thead table {
-	background-color: #222;
-	color: #fff;
-}
-
-td {
-	border: 1px solid #e0e0e0;
-}`,
-			`.thead table {
-	background-color: #1089ff;
-	color: #fff;
-}
-
-.tbody td {
-	border-bottom: 3px solid #f8f9fd;
-}`,
-		];
-		let activeStyle = styles[0];
-		styleChange();
+		const memory = [];
+		styleChange(window.uTableStyles[0]);
 
 		// UTable
 		const uTable = window.UTable.UTable; // Module is namespaced in UMD build
@@ -376,6 +342,7 @@ td {
 				},
 			}),
 		}));
+		const options = {};
 
 		// Events
 		function update() {
@@ -386,13 +353,14 @@ td {
 			});
 		}
 
-		function styleChange(style = activeStyle) {
+		function styleChange(style) {
 			let styleEl = document.getElementById('dynamicStyle');
 			if (!styleEl) {
 				styleEl = document.createElement('style');
 				styleEl.id = 'dynamicStyle';
 				document.head.appendChild(styleEl);
 			}
+			memory.push(style);
 			styleEl.textContent = style;
 			code.textContent = style;
 			activeStyle = style;
@@ -414,8 +382,15 @@ td {
 		});
 
 		styleButton.addEventListener('click', () => {
-			const _styles = styles.filter((style) => style !== activeStyle);
-			styleChange(_styles[Math.floor(Math.random() * _styles.length)]);
+			// Reset memory
+			if (memory.length === window.uTableStyles.length) {
+				memory.splice(0, memory.length - 1);
+			}
+			// Random style
+			const styles = window.uTableStyles.filter(
+				(style) => !memory.includes(style)
+			);
+			styleChange(styles[Math.floor(Math.random() * styles.length)]);
 			update();
 		});
 	</script>

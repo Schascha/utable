@@ -40,18 +40,18 @@
 
 .utable {
 	margin: 0 0 3rem;
+}
 
-	& td,
-	& th {
-		padding: 0.5rem 1.25rem;
-		text-align: left;
-	}
+td,
+th {
+	padding: 0.5rem 1.25rem;
+	text-align: left;
+}
 
-	& .thead {
-		display: flex;
-		justify-content: flex-end;
-		flex-wrap: wrap;
-	}
+.thead {
+	display: flex;
+	justify-content: flex-end;
+	flex-wrap: wrap;
 }
 
 /* Buttons */
