@@ -1,7 +1,7 @@
 import { getCache, setCache } from './cache';
 import { UTableDefaults } from './defaults';
-import type { IUTable, IUTableOptions, IUTableCache } from './types';
-import { createElement, setStyles } from './utils';
+import type { IUTable, IUTableOptions } from './types';
+import { createElement, setStyles, scrollTo } from './utils';
 
 export class UTable implements IUTable {
 	isScrollable: boolean = false;
@@ -350,24 +350,7 @@ export class UTable implements IUTable {
 		);
 
 		// Observe top element
-		this.observer.observe(top);
-	}
-
-	/**
-	 * Scroll to position
-	 * @param {number} left - Scroll left position
-	 * @private
-	 */
-	_scrollTo(left: number) {
-		const { scrollerBody } = this;
-		if ('scrollBehavior' in document.documentElement.style) {
-			scrollerBody.scrollTo({
-				behavior: 'smooth',
-				left,
-			});
-		} else {
-			scrollerBody.scrollLeft = left;
-		}
+		this.observer?.observe(top);
 	}
 
 	/**
@@ -495,7 +478,7 @@ export class UTable implements IUTable {
 	 */
 	_onClickButtonLeft(e: Event) {
 		const { clientWidth, scrollLeft } = this.scrollerBody;
-		this._scrollTo(scrollLeft - clientWidth * 0.75);
+		scrollTo(this.scrollerBody, { left: scrollLeft - clientWidth * 0.75 });
 		this._isScrollable();
 		this.options.onClickButtonLeft?.(e);
 	}
@@ -506,7 +489,7 @@ export class UTable implements IUTable {
 	 */
 	_onClickButtonRight(e: Event) {
 		const { clientWidth, scrollLeft } = this.scrollerBody;
-		this._scrollTo(scrollLeft + clientWidth * 0.75);
+		scrollTo(this.scrollerBody, { left: scrollLeft + clientWidth * 0.75 });
 		this._isScrollable();
 		this.options.onClickButtonRight?.(e);
 	}

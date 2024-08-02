@@ -1,6 +1,6 @@
 import { getCache, setCache } from './cache';
 import { UTableDefaults } from './defaults';
-import { createElement, setStyles } from './utils';
+import { createElement, setStyles, scrollTo } from './utils';
 export class UTable {
     constructor(table, options) {
         this.isScrollable = false;
@@ -281,6 +281,7 @@ export class UTable {
      * @private
      */
     _isSticky() {
+        var _a;
         const { options, top, trackHead } = this;
         const { classSticky, sticky } = options;
         if (!sticky || !window.IntersectionObserver || !top || !trackHead)
@@ -288,24 +289,7 @@ export class UTable {
         // Detect when headers gets sticky
         this.observer = new window.IntersectionObserver(([e]) => trackHead === null || trackHead === void 0 ? void 0 : trackHead.classList.toggle(classSticky, e.intersectionRatio < 1), { threshold: [1] });
         // Observe top element
-        this.observer.observe(top);
-    }
-    /**
-     * Scroll to position
-     * @param {number} left - Scroll left position
-     * @private
-     */
-    _scrollTo(left) {
-        const { scrollerBody } = this;
-        if ('scrollBehavior' in document.documentElement.style) {
-            scrollerBody.scrollTo({
-                behavior: 'smooth',
-                left,
-            });
-        }
-        else {
-            scrollerBody.scrollLeft = left;
-        }
+        (_a = this.observer) === null || _a === void 0 ? void 0 : _a.observe(top);
     }
     /**
      * Set equal width to cells
@@ -412,7 +396,7 @@ export class UTable {
     _onClickButtonLeft(e) {
         var _a, _b;
         const { clientWidth, scrollLeft } = this.scrollerBody;
-        this._scrollTo(scrollLeft - clientWidth * 0.75);
+        scrollTo(this.scrollerBody, { left: scrollLeft - clientWidth * 0.75 });
         this._isScrollable();
         (_b = (_a = this.options).onClickButtonLeft) === null || _b === void 0 ? void 0 : _b.call(_a, e);
     }
@@ -423,7 +407,7 @@ export class UTable {
     _onClickButtonRight(e) {
         var _a, _b;
         const { clientWidth, scrollLeft } = this.scrollerBody;
-        this._scrollTo(scrollLeft + clientWidth * 0.75);
+        scrollTo(this.scrollerBody, { left: scrollLeft + clientWidth * 0.75 });
         this._isScrollable();
         (_b = (_a = this.options).onClickButtonRight) === null || _b === void 0 ? void 0 : _b.call(_a, e);
     }

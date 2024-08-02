@@ -48,10 +48,11 @@
      * Create element
      * @param {K} tag - Element tag
      * @param {Object} options - Element options
-     * @param {string} options.className - Element class name
-     * @param {string} options.insertMethod - Insert method, default is append
-     * @param {Element} options.parent - Parent element
-     * @returns {HTMLElementTagNameMap[K]} - Element
+     * @param {string} [options.className] - Element class name
+     * @param {string} [options.insertMethod] - Method to insert the element, default is append
+     * @param {Element} [options.parent] - Parent element
+     * @param {HTMLElement[]} [options.children] - Children elements to append to the created element
+     * @returns {HTMLElementTagNameMap[K]} - Created element
      */
     function createElement(tag, options = {}) {
         const el = document.createElement(tag);
@@ -59,20 +60,37 @@
         if (className)
             el.className = className;
         if (parent)
-            parent[insertMethod || 'append'](el);
+            parent[insertMethod !== null && insertMethod !== void 0 ? insertMethod : 'append'](el);
         if (children)
             children.forEach((child) => el.appendChild(child));
         return el;
     }
     /**
      * Set styles to elements
-     * @param {HTMLElement | HTMLElement[]} el - Element
-     * @param {Partial<CSSStyleDeclaration>} styles - Styles
+     * @param {HTMLElement | HTMLElement[]} el - Element or array of elements
+     * @param {Partial<CSSStyleDeclaration>} styles - Styles to be applied
      */
     function setStyles(el, styles) {
-        if (!Array.isArray(el))
-            el = [el];
-        el.forEach((el) => Object.assign(el.style, styles));
+        if (!el)
+            return;
+        if (Array.isArray(el))
+            el.forEach((el) => el && Object.assign(el.style, styles));
+        else
+            Object.assign(el.style, styles);
+    }
+    /**
+     * Scroll to element with smooth behavior if supported
+     * @param {HTMLElement} el - Element
+     * @param {ScrollToOptions} options - Scroll options
+     */
+    function scrollTo(el, options) {
+        var _a, _b;
+        if ('scrollBehavior' in document.documentElement.style) {
+            el.scrollTo(Object.assign({ behavior: 'smooth' }, options));
+        }
+        else {
+            el.scrollTo((_a = options.left) !== null && _a !== void 0 ? _a : 0, (_b = options.top) !== null && _b !== void 0 ? _b : 0);
+        }
     }
 
     class UTable {
@@ -355,6 +373,7 @@
          * @private
          */
         _isSticky() {
+            var _a;
             const { options, top, trackHead } = this;
             const { classSticky, sticky } = options;
             if (!sticky || !window.IntersectionObserver || !top || !trackHead)
@@ -362,24 +381,7 @@
             // Detect when headers gets sticky
             this.observer = new window.IntersectionObserver(([e]) => trackHead === null || trackHead === void 0 ? void 0 : trackHead.classList.toggle(classSticky, e.intersectionRatio < 1), { threshold: [1] });
             // Observe top element
-            this.observer.observe(top);
-        }
-        /**
-         * Scroll to position
-         * @param {number} left - Scroll left position
-         * @private
-         */
-        _scrollTo(left) {
-            const { scrollerBody } = this;
-            if ('scrollBehavior' in document.documentElement.style) {
-                scrollerBody.scrollTo({
-                    behavior: 'smooth',
-                    left,
-                });
-            }
-            else {
-                scrollerBody.scrollLeft = left;
-            }
+            (_a = this.observer) === null || _a === void 0 ? void 0 : _a.observe(top);
         }
         /**
          * Set equal width to cells
@@ -486,7 +488,7 @@
         _onClickButtonLeft(e) {
             var _a, _b;
             const { clientWidth, scrollLeft } = this.scrollerBody;
-            this._scrollTo(scrollLeft - clientWidth * 0.75);
+            scrollTo(this.scrollerBody, { left: scrollLeft - clientWidth * 0.75 });
             this._isScrollable();
             (_b = (_a = this.options).onClickButtonLeft) === null || _b === void 0 ? void 0 : _b.call(_a, e);
         }
@@ -497,7 +499,7 @@
         _onClickButtonRight(e) {
             var _a, _b;
             const { clientWidth, scrollLeft } = this.scrollerBody;
-            this._scrollTo(scrollLeft + clientWidth * 0.75);
+            scrollTo(this.scrollerBody, { left: scrollLeft + clientWidth * 0.75 });
             this._isScrollable();
             (_b = (_a = this.options).onClickButtonRight) === null || _b === void 0 ? void 0 : _b.call(_a, e);
         }

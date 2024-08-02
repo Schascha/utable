@@ -74,12 +74,6 @@ export declare class UTable implements IUTable {
      */
     _isSticky(): void;
     /**
-     * Scroll to position
-     * @param {number} left - Scroll left position
-     * @private
-     */
-    _scrollTo(left: number): void;
-    /**
      * Set equal width to cells
      * @private
      */
