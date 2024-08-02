@@ -1,10 +1,13 @@
 import { UTable } from './utable';
+import { UTableDefaults } from './defaults';
 
 describe('UTable', () => {
 	let tableEl: HTMLTableElement;
 	let utable: UTable;
+	let intesectionObserver: any;
 
 	beforeEach(() => {
+		intesectionObserver = window.IntersectionObserver;
 		tableEl = document.createElement('table');
 		tableEl.innerHTML = `
       <thead>
@@ -22,7 +25,12 @@ describe('UTable', () => {
 		if (document.body.contains(tableEl)) {
 			document.body.removeChild(tableEl);
 		}
+		window.IntersectionObserver = intesectionObserver;
 	});
+
+	/**
+	 * Initialization
+	 */
 
 	it('should initialize from HTMLTableElement', () => {
 		utable = new UTable(tableEl);
@@ -37,24 +45,80 @@ describe('UTable', () => {
 	});
 
 	it('should throw error if table is not found', () => {
-		expect(() => new UTable('not-found')).toThrow();
+		expect(() => new UTable('.table')).toThrow();
+	});
+
+	it('should use default options', () => {
+		utable = new UTable(tableEl);
+		expect(utable.options).toEqual(UTableDefaults);
+	});
+
+	it('should use data-attributes', () => {
+		tableEl.setAttribute('data-options', JSON.stringify({ sticky: false }));
+		utable = new UTable(tableEl);
+		expect(utable.options.sticky).toBeFalsy();
+		utable.destroy();
+		tableEl.setAttribute('data-options', JSON.stringify({ sticky: true }));
+		utable.update();
+		expect(utable.options.sticky).toBeTruthy();
 	});
 
 	it('should destroy', () => {
 		utable = new UTable(tableEl);
+		const { classWrapper } = utable.options;
 		utable.destroy();
-		expect(
-			document.querySelector(`.${utable.options.classWrapper}`)
-		).toBeFalsy();
+		expect(document.querySelector(`.${classWrapper}`)).toBeFalsy();
 	});
 
-	it('should use render method on update', () => {
+	it('should update', () => {
 		utable = new UTable(tableEl);
+		const { classWrapper } = utable.options;
 		const spy = jest.spyOn(utable, 'render');
 		utable.destroy();
 		utable.update();
 		expect(spy).toHaveBeenCalled();
+		expect(document.querySelector(`.${classWrapper}`)).toBeTruthy();
 	});
+
+	/**
+	 * Buttons
+	 */
+
+	it('should have buttons', () => {
+		utable = new UTable(tableEl);
+		const { classButtonLeft, classButtonRight } = utable.options;
+		expect(document.querySelector(`.${classButtonLeft}`)).toBeTruthy();
+		expect(document.querySelector(`.${classButtonRight}`)).toBeTruthy();
+	});
+
+	it('should not have buttons', () => {
+		utable = new UTable(tableEl, { buttons: false });
+		const { classButtonLeft, classButtonRight } = utable.options;
+		expect(document.querySelector(`.${classButtonLeft}`)).toBeFalsy();
+		expect(document.querySelector(`.${classButtonRight}`)).toBeFalsy();
+	});
+
+	/**
+	 * Overlays
+	 */
+
+	it('should have overlays', () => {
+		utable = new UTable(tableEl);
+		const { classOverlayLeft, classOverlayRight } = utable.options;
+		expect(document.querySelector(`.${classOverlayLeft}`)).toBeTruthy();
+		expect(document.querySelector(`.${classOverlayRight}`)).toBeTruthy();
+	});
+
+	it('should not have overlays', () => {
+		utable = new UTable(tableEl, { overlays: false });
+		const { classOverlayLeft, classOverlayRight } = utable.options;
+		expect(document.querySelector(`.${classOverlayLeft}`)).toBeFalsy();
+		expect(document.querySelector(`.${classOverlayRight}`)).toBeFalsy();
+	});
+
+	/**
+	 * Sticky
+	 */
 
 	it('should observe', () => {
 		// Mock IntersectionObserver
@@ -78,7 +142,13 @@ describe('UTable', () => {
 		expect(utable.trackHead?.classList.contains(classSticky)).toBe(false);
 	});
 
-	it('should not observe', () => {
+	it('should not observe if IntersectionObserver is not supported', () => {
+		delete (window as any).IntersectionObserver;
+		utable = new UTable(tableEl);
+		expect(utable.observer).toBeUndefined();
+	});
+
+	it('should not observe if option sticky is disabled', () => {
 		const mockIntersectionObserver = jest.fn();
 		(window as any).IntersectionObserver = mockIntersectionObserver;
 		utable = new UTable(tableEl, { sticky: false });
