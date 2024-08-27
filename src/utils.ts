@@ -49,7 +49,7 @@ export function setStyles(
  * @param {ScrollToOptions} options - Scroll options
  */
 export function scrollTo(el: HTMLElement, options: ScrollToOptions) {
-	if ('scrollBehavior' in document.documentElement.style) {
+	if (isScrollBehaviorSupported()) {
 		el.scrollTo({
 			behavior: 'smooth',
 			...options,
@@ -57,4 +57,12 @@ export function scrollTo(el: HTMLElement, options: ScrollToOptions) {
 	} else {
 		el.scrollTo(options.left ?? 0, options.top ?? 0);
 	}
+}
+
+/**
+ * Check if scroll behavior is supported
+ * @returns {boolean} - Scroll behavior support
+ */
+export function isScrollBehaviorSupported(): boolean {
+	return 'scrollBehavior' in document.documentElement.style;
 }
