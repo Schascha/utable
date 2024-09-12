@@ -2,8 +2,8 @@
 const buttons = document.getElementById('buttons');
 const overlays = document.getElementById('overlays');
 const width = document.getElementById('width');
-const styleButton = document.getElementById('style');
-const back = document.getElementById('back');
+const next = document.getElementById('prev');
+const prev = document.getElementById('next');
 const code = document.getElementById('code');
 
 // Append dynamic style tag
@@ -37,7 +37,6 @@ const options = {};
 
 // Events
 function update() {
-	console.log('Updated', styleIndex, style);
 	tables.forEach(({ el, table }) => {
 		el.dataset.options = JSON.stringify(options);
 		table.destroy();
@@ -48,20 +47,6 @@ function update() {
 function setStyle(style) {
 	styleEl.textContent = style;
 	code.textContent = style;
-}
-
-function next() {
-	styleIndex = (styleIndex + 1) % styles.length;
-	style = styles[styleIndex];
-	setStyle(style);
-	update();
-}
-
-function prev() {
-	styleIndex = (styleIndex - 1 + styles.length) % styles.length;
-	style = styles[styleIndex];
-	setStyle(style);
-	update();
 }
 
 buttons.addEventListener('change', (e) => {
@@ -79,10 +64,16 @@ width.addEventListener('change', (e) => {
 	update();
 });
 
-styleButton.addEventListener('click', () => {
-	next();
+next.addEventListener('click', () => {
+	styleIndex = (styleIndex + 1) % styles.length;
+	style = styles[styleIndex];
+	setStyle(style);
+	update();
 });
 
-back.addEventListener('click', () => {
-	prev();
+prev.addEventListener('click', () => {
+	styleIndex = (styleIndex - 1 + styles.length) % styles.length;
+	style = styles[styleIndex];
+	setStyle(style);
+	update();
 });

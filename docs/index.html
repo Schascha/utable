@@ -13,29 +13,37 @@
 			<h1>uTable</h1>
 
 			<form>
-				<label class="switch">
+				<div class="form-field switch">
 					<input type="checkbox" id="buttons" checked />
-					<span class="switch-slider"></span>
-					<span class="switch-label">Buttons</span>
-				</label>
-
-				<label class="switch">
-					<input type="checkbox" id="overlays" checked />
-					<span class="switch-slider"></span>
-					<span class="switch-label">Overlays</span>
-				</label>
-
-				<label class="switch">
-					<input type="checkbox" id="width" />
-					<span class="switch-slider"></span>
-					<span class="switch-label">Fixed</span>
-				</label>
-
-				<div class="styles">
-					<button type="button" id="back">Back</button>
-					<button type="button" id="style">Change styles</button>
-					<pre><code id="code"></code></pre>
+					<label for="buttons" class="switch-slider"></label>
+					<label for="buttons">Buttons</label>
 				</div>
+
+				<div class="form-field switch">
+					<input type="checkbox" id="overlays" checked />
+					<label for="overlays" class="switch-slider"></label>
+					<label for="overlays">Overlays</label>
+				</div>
+
+				<div class="form-field switch">
+					<input type="checkbox" id="width" />
+					<label for="width" class="switch-slider"></label>
+					<label for="width">Fixed</label>
+				</div>
+
+				<div class="form-field styles">
+					<div class="button-group">
+						<button type="button" id="prev">
+							<span class="sr-only">Prev style</span>
+						</button>
+						<button type="button" id="next">
+							<span class="sr-only">Next style</span>
+						</button>
+					</div>
+					<label for="next">Styles</label>
+				</div>
+
+				<pre><code id="code"></code></pre>
 			</form>
 		</header>
 
