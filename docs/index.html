@@ -32,6 +32,7 @@
 				</label>
 
 				<div class="styles">
+					<button type="button" id="back" disabled>Back</button>
 					<button type="button" id="style">Change styles</button>
 					<pre><code id="code"></code></pre>
 				</div>
@@ -314,84 +315,5 @@
 
 	<script src="utable.js"></script>
 	<script src="styles.js"></script>
-	<script>
-		// Form
-		const buttons = document.getElementById('buttons');
-		const overlays = document.getElementById('overlays');
-		const width = document.getElementById('width');
-		const styleButton = document.getElementById('style');
-		const code = document.getElementById('code');
-
-		// Styles
-		const memory = [];
-		styleChange(window.uTableStyles[0]);
-
-		// UTable
-		const uTable = window.UTable.UTable; // Module is namespaced in UMD build
-		const tables = Array.from(document.querySelectorAll('table')).map((el) => ({
-			el,
-			table: new uTable(el, {
-				onClickButtonLeft: (e) => {
-					console.log('Left button clicked', e);
-				},
-				onClickButtonRight: (e) => {
-					console.log('Right button clicked', e);
-				},
-				onScrollend: (e) => {
-					console.log('Scrolled', e);
-				},
-			}),
-		}));
-		const options = {};
-
-		// Events
-		function update() {
-			tables.forEach(({ el, table }) => {
-				el.dataset.options = JSON.stringify(options);
-				table.destroy();
-				table.render();
-			});
-		}
-
-		function styleChange(style) {
-			let styleEl = document.getElementById('dynamicStyle');
-			if (!styleEl) {
-				styleEl = document.createElement('style');
-				styleEl.id = 'dynamicStyle';
-				document.head.appendChild(styleEl);
-			}
-			memory.push(style);
-			styleEl.textContent = style;
-			code.textContent = style;
-			activeStyle = style;
-		}
-
-		buttons.addEventListener('change', (e) => {
-			options.buttons = e.target.checked;
-			update();
-		});
-
-		overlays.addEventListener('change', (e) => {
-			options.overlays = e.target.checked;
-			update();
-		});
-
-		width.addEventListener('change', (e) => {
-			options.width = e.target.checked ? 'fixed' : 'auto';
-			update();
-		});
-
-		styleButton.addEventListener('click', () => {
-			// Reset memory
-			if (memory.length === window.uTableStyles.length) {
-				memory.splice(0, memory.length - 1);
-			}
-			// Random style
-			const styles = window.uTableStyles.filter(
-				(style) => !memory.includes(style)
-			);
-			styleChange(styles[Math.floor(Math.random() * styles.length)]);
-			update();
-		});
-	</script>
+	<script src="docs.js"></script>
 </html>

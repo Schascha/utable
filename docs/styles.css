@@ -94,6 +94,11 @@ footer {
 		border-radius: 0.25rem;
 		padding: 0.5rem 1rem;
 		cursor: pointer;
+
+		&[disabled] {
+			cursor: normal;
+			opacity: 0.5;
+		}
 	}
 
 	& pre {
