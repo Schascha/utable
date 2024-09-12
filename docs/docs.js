@@ -12,10 +12,9 @@ styleEl.id = 'dynamicStyle';
 document.head.appendChild(styleEl);
 
 // Styles
-let style = window.uTableStyles[0]
-const store = [style];
-const memory = [style];
-let storeIndex = 0;
+const styles = window.uTableStyles;
+let styleIndex = 0;
+let style = styles[styleIndex]
 setStyle(style);
 
 // UTable
@@ -38,6 +37,7 @@ const options = {};
 
 // Events
 function update() {
+	console.log('Updated', styleIndex, style);
 	tables.forEach(({ el, table }) => {
 		el.dataset.options = JSON.stringify(options);
 		table.destroy();
@@ -46,43 +46,22 @@ function update() {
 }
 
 function setStyle(style) {
-	back.disabled = storeIndex <= 0;
 	styleEl.textContent = style;
 	code.textContent = style;
 }
 
 function next() {
-	if (store.length && ++storeIndex < store.length) {
-		style = store[storeIndex];
-		setStyle(style);
-	} else {
-		generate();
-	}
+	styleIndex = (styleIndex + 1) % styles.length;
+	style = styles[styleIndex];
+	setStyle(style);
 	update();
 }
 
 function prev() {
-	if (storeIndex) {
-		style = store[--storeIndex];
-		setStyle(style);
-		update();
-	}
-}
-
-function generate() {
-	// Reset memory
-	if (memory.length === window.uTableStyles.length) {
-		memory.splice(0, Math.floor(memory.length / 2));
-	}
-	// Random style
-	const styles = window.uTableStyles.filter(
-		(style) => !memory.includes(style)
-	);
-	style = styles[Math.floor(Math.random() * styles.length)];
-	memory.push(style);
-	store.push(style);
-	storeIndex = store.length - 1;
+	styleIndex = (styleIndex - 1 + styles.length) % styles.length;
+	style = styles[styleIndex];
 	setStyle(style);
+	update();
 }
 
 buttons.addEventListener('change', (e) => {
