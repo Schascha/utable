@@ -54,6 +54,15 @@ th {
 	flex-wrap: wrap;
 }
 
+.tbody th {
+	text-align: left;
+
+	& span {
+		position: sticky;
+		left: 1.25rem;
+	}
+}
+
 /* Buttons */
 
 :root {

@@ -39,10 +39,17 @@ export function setStyles(el, styles) {
  */
 export function scrollTo(el, options) {
     var _a, _b;
-    if ('scrollBehavior' in document.documentElement.style) {
+    if (isScrollBehaviorSupported()) {
         el.scrollTo(Object.assign({ behavior: 'smooth' }, options));
     }
     else {
         el.scrollTo((_a = options.left) !== null && _a !== void 0 ? _a : 0, (_b = options.top) !== null && _b !== void 0 ? _b : 0);
     }
+}
+/**
+ * Check if scroll behavior is supported
+ * @returns {boolean} - Scroll behavior support
+ */
+export function isScrollBehaviorSupported() {
+    return 'scrollBehavior' in document.documentElement.style;
 }

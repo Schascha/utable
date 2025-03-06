@@ -26,3 +26,8 @@ export declare function setStyles(el: HTMLElement | HTMLElement[], styles: Parti
  * @param {ScrollToOptions} options - Scroll options
  */
 export declare function scrollTo(el: HTMLElement, options: ScrollToOptions): void;
+/**
+ * Check if scroll behavior is supported
+ * @returns {boolean} - Scroll behavior support
+ */
+export declare function isScrollBehaviorSupported(): boolean;
